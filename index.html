@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-Content-Type-Options" content="nosniff">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>Deepthanush Chowdary | Aspiring AI Engineer</title>
+  <meta name="description" content="Portfolio of Deepthanush Chowdary, Computer Science student at KL University.">
+  <link rel="icon" type="image/jpeg" href="assets/images/avatar.jpg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+            mono: ['ui-monospace', 'SFMono-Regular', 'Menlo', 'Monaco', 'Consolas', 'monospace'],
+          },
+          colors: {
+            border: 'var(--border)',
+            input: 'var(--input)',
+            ring: 'var(--ring)',
+            background: 'var(--background)',
+            foreground: 'var(--foreground)',
+            primary: {
+              DEFAULT: 'var(--primary)',
+              foreground: 'var(--primary-foreground)',
+            },
+            secondary: {
+              DEFAULT: 'var(--secondary)',
+              foreground: 'var(--secondary-foreground)',
+            },
+            muted: {
+              DEFAULT: 'var(--muted)',
+              foreground: 'var(--muted-foreground)',
+            },
+            accent: {
+              DEFAULT: 'var(--accent)',
+              foreground: 'var(--accent-foreground)',
+            },
+            card: {
+              DEFAULT: 'var(--card)',
+              foreground: 'var(--card-foreground)',
+            },
+          }
+        }
+      }
+    }
+  </script>
+  <link rel="stylesheet" href="assets/css/style.css">
+  <script>
+    (function() {
+      try {
+        const stored = localStorage.getItem('theme');
+        // Default to light theme unless the user explicitly chose dark
+        if (stored === 'dark') {
+          document.documentElement.classList.add('dark');
+        }
+      } catch (e) {
+        // localStorage unavailable; stay on light theme
+      }
+    })();
+  </script>
+  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+</head>
+<body class="bg-background text-foreground antialiased">
+  
+  <div id="preloader" class="fixed inset-0 z-[100] flex items-center justify-center bg-background transition-opacity duration-700 ease-out">
+    <div class="flex flex-col items-center gap-6">
+      <div class="relative">
+        <div class="h-12 w-12 animate-spin rounded-full border-4 border-border border-t-primary"></div>
+        <div class="absolute inset-0 h-12 w-12 animate-ping rounded-full border border-primary/30 opacity-20"></div>
+      </div>
+      <div class="text-center">
+        <p class="text-lg font-semibold tracking-tight">Deepthanush Chowdary</p>
+        <p class="mt-1 font-mono text-xs text-muted-foreground">Verifying you're human...</p>
+      </div>
+      <div id="turnstileContainer" class="rounded-lg border border-border bg-card p-4 shadow-sm">
+        <div class="cf-turnstile" data-sitekey="0x4AAAAAACvzvtywbMlUWN05" data-theme="auto" data-size="normal" data-callback="onTurnstileSuccess" data-error-callback="onTurnstileError" data-expired-callback="onTurnstileExpired"></div>
+      </div>
+      <p id="turnstileError" class="hidden text-sm text-red-500">Verification failed. Please try again.</p>
+      <button id="turnstileSkip" class="hidden rounded-full border border-border bg-background px-4 py-2 text-sm font-medium text-muted-foreground transition-all hover:bg-secondary hover:text-foreground">
+        Continue anyway
+      </button>
+    </div>
+  </div>
+
+  <header class="fixed top-0 left-0 right-0 z-50">
+    <nav class="relative mx-auto flex h-14 max-w-4xl items-center px-4">
+      <div class="flex-1"></div>
+      <div class="flex items-center space-x-1 md:space-x-2">
+        <a href="#top" class="nav-btn group" aria-label="Home">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+          <span class="hidden md:inline">Home</span>
+        </a>
+        <a href="#about" class="nav-btn group" aria-label="About">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><line x1="16" x2="8" y1="13" y2="13"/><line x1="16" x2="8" y1="17" y2="17"/><line x1="10" x2="8" y1="9" y2="9"/></svg>
+          <span class="hidden md:inline">About</span>
+        </a>
+        <a href="#work" class="nav-btn group" aria-label="Work">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="14" x="2" y="7" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+          <span class="hidden md:inline">Work</span>
+        </a>
+        <a href="#certifications" class="nav-btn group" aria-label="Certifications">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="7"/><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"/></svg>
+          <span class="hidden md:inline">Certs</span>
+        </a>
+
+        <a href="#education" class="nav-btn group" aria-label="Education">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
+          <span class="hidden md:inline">Education</span>
+        </a>
+      </div>
+
+      <div class="flex-1 flex items-center justify-end gap-2">
+        <button id="themeToggle" class="flex h-9 w-9 items-center justify-center rounded-full border border-border bg-background text-muted-foreground shadow-sm transition-all hover:bg-secondary hover:text-foreground" aria-label="Toggle theme">
+          <svg id="sunIcon" class="hidden h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg>
+          <svg id="moonIcon" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>
+        </button>
+        <button id="menuToggle" class="flex h-9 w-9 items-center justify-center rounded-full border border-border bg-background md:hidden" aria-label="Toggle menu">
+          <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="18" y2="18"/></svg>
+        </button>
+      </div>
+    </nav>
+
+    <div id="mobileMenu" class="hidden border-t border-border/60 bg-background/75 px-4 py-3 backdrop-blur-xl backdrop-saturate-200 md:hidden">
+      <div class="grid grid-cols-3 gap-2">
+        <a href="#top" class="mobile-nav-btn"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>Home</a>
+        <a href="#about" class="mobile-nav-btn"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><line x1="16" x2="8" y1="13" y2="13"/><line x1="16" x2="8" y1="17" y2="17"/><line x1="10" x2="8" y1="9" y2="9"/></svg>About</a>
+        <a href="#work" class="mobile-nav-btn"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="14" x="2" y="7" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>Work</a>
+        <a href="#certifications" class="mobile-nav-btn"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="7"/><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"/></svg>Certs</a>
+
+        <a href="#education" class="mobile-nav-btn"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>Education</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="mx-auto max-w-4xl px-4 pb-12 pt-20">
+    
+    <section id="top" class="mb-16 scroll-mt-28">
+      <div class="flex flex-col-reverse items-center gap-6 md:flex-row md:items-start md:justify-between">
+        <div class="hero-content flex-1 space-y-2 text-center md:text-left">
+          <h1 class="hero-title text-xl font-bold tracking-tight break-words sm:text-2xl md:text-4xl">Deepthanush Chowdary</h1>
+          <div class="hero-subtitle-line flex flex-wrap items-center justify-center gap-1.5 md:justify-start font-mono text-sm font-semibold text-muted-foreground">
+            <span><span id="liveAge">18.000000000</span> year old</span>
+            <span>aspiring AI Engineer</span>
+          </div>
+          <div class="flex flex-wrap items-center justify-center gap-2 pt-2 md:justify-start">
+            <a href="https://github.com/Deepthanush1337" target="_blank" rel="noopener noreferrer" class="social-btn" aria-label="GitHub">
+              <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"/><path d="M9 18c-4.51 2-5-2-7-2"/></svg>
+            </a>
+            <a href="https://in.linkedin.com/in/deepthanush-chowdary-p-324454339" target="_blank" rel="noopener noreferrer" class="social-btn" aria-label="LinkedIn">
+              <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect width="4" height="12" x="2" y="9"/><circle cx="4" cy="4" r="2"/></svg>
+            </a>
+            <a href="https://x.com/deepthanushcho" target="_blank" rel="noopener noreferrer" class="social-btn" aria-label="X (Twitter)">
+              <svg class="h-4 w-4" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+            </a>
+            <a href="mailto:deepthanush1337@icloud.com" id="emailBtn" class="social-btn" aria-label="Email">
+              <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+            </a>
+          </div>
+        </div>
+        <div class="h-32 w-32 shrink-0 overflow-hidden rounded-lg border-2 border-border bg-secondary shadow-md md:h-28 md:w-28 md:border">
+          <img src="assets/images/avatar.jpg" alt="Deepthanush Chowdary" class="h-full w-full object-cover">
+        </div>
+      </div>
+    </section>
+
+    <section id="about" class="mb-16 flex min-h-0 flex-col gap-y-3 scroll-mt-28">
+      <h2 class="text-xl font-bold">About</h2>
+      <div class="rounded-lg border border-border bg-card p-5 text-pretty text-sm leading-relaxed text-muted-foreground shadow-sm">
+        I'm Deepthanush Chowdary, a Computer Science & Engineering student who has been passionate about technology since the age of 12. I started by exploring how software works, reverse engineering applications, and experimenting with different tools out of curiosity. Over time, that curiosity evolved into a passion for building things, and today I focus on AI, machine learning, backend development, and systems programming. I enjoy understanding how things work under the hood and building projects that solve real-world problems.
+      </div>
+    </section>
+
+    <section id="work" class="mb-16 flex min-h-0 flex-col gap-y-3 scroll-mt-28">
+      <h2 class="text-xl font-bold">Work Experience</h2>
+      <div class="rounded-lg border border-border bg-card p-5 shadow-sm">
+        <p class="text-pretty text-sm leading-relaxed text-muted-foreground">Soon :D</p>
+      </div>
+    </section>
+
+    <section id="certifications" class="mb-16 flex min-h-0 flex-col gap-y-3 scroll-mt-28">
+      <h2 class="text-xl font-bold">Certifications</h2>
+      <div class="grid gap-3 md:grid-cols-2">
+        <a href="https://www.coursera.org/verify/FNQY1RTCWU5G" target="_blank" rel="noopener noreferrer" class="group flex h-full items-start gap-3 rounded-lg border border-border bg-card p-4 shadow-sm transition-all duration-300 hover:shadow-md">
+          <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-border bg-secondary">
+            <svg class="h-6 w-6" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+          </div>
+          <div class="min-w-0 flex-1">
+            <h3 class="text-base font-semibold transition-colors group-hover:text-primary/80">Google AI Essentials</h3>
+            <p class="mt-0.5 text-sm text-muted-foreground">Google</p>
+          </div>
+          <svg class="h-5 w-5 shrink-0 text-muted-foreground transition-colors group-hover:text-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" x2="21" y1="14" y2="3"/></svg>
+        </a>
+        <a href="https://coursera.org/share/34b356236356b58f5440311a63f688d6" target="_blank" rel="noopener noreferrer" class="group flex h-full items-start gap-3 rounded-lg border border-border bg-card p-4 shadow-sm transition-all duration-300 hover:shadow-md">
+          <div class="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-full border border-border bg-secondary p-1">
+            <img src="assets/images/iit-bombay-logo.svg" alt="IIT Bombay" class="h-full w-full object-contain">
+          </div>
+          <div class="min-w-0 flex-1">
+            <h3 class="text-base font-semibold transition-colors group-hover:text-primary/80">Introduction to Internet of Things</h3>
+            <p class="mt-0.5 text-sm text-muted-foreground">IIT Bombay</p>
+          </div>
+          <svg class="h-5 w-5 shrink-0 text-muted-foreground transition-colors group-hover:text-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" x2="21" y1="14" y2="3"/></svg>
+        </a>
+        <a href="https://coursera.org/share/757134c70b42cf9f9c25b4604e56e1a3" target="_blank" rel="noopener noreferrer" class="group flex h-full items-start gap-3 rounded-lg border border-border bg-card p-4 shadow-sm transition-all duration-300 hover:shadow-md">
+          <div class="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-full border border-border bg-secondary p-1">
+            <img src="assets/images/deeplearning-ai-logo.webp" alt="DeepLearning.AI" class="h-full w-full object-contain">
+          </div>
+          <div class="min-w-0 flex-1">
+            <h3 class="text-base font-semibold transition-colors group-hover:text-primary/80">AI For Everyone</h3>
+            <p class="mt-0.5 text-sm text-muted-foreground">DeepLearning.AI</p>
+          </div>
+          <svg class="h-5 w-5 shrink-0 text-muted-foreground transition-colors group-hover:text-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" x2="21" y1="14" y2="3"/></svg>
+        </a>
+        <a href="https://www.coursera.org/verify/RCWRCWM5A1DE" target="_blank" rel="noopener noreferrer" class="group flex h-full items-start gap-3 rounded-lg border border-border bg-card p-4 shadow-sm transition-all duration-300 hover:shadow-md">
+          <div class="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-full border border-border bg-secondary p-1">
+            <img src="assets/images/coursera-logo.png" alt="Coursera" class="h-full w-full object-contain">
+          </div>
+          <div class="min-w-0 flex-1">
+            <h3 class="text-base font-semibold transition-colors group-hover:text-primary/80">API Testing a real web application via Postman</h3>
+            <p class="mt-0.5 text-sm text-muted-foreground">Coursera</p>
+          </div>
+          <svg class="h-5 w-5 shrink-0 text-muted-foreground transition-colors group-hover:text-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" x2="21" y1="14" y2="3"/></svg>
+        </a>
+      </div>
+    </section>
+
+    <section id="opensource" class="mb-16 flex min-h-0 flex-col gap-y-3 scroll-mt-28">
+      <div class="flex items-center gap-2">
+        <h2 class="text-xl font-bold">Open Source Work</h2>
+        <span class="relative flex h-2.5 w-2.5">
+          <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-400 opacity-75"></span>
+          <span class="relative inline-flex h-2.5 w-2.5 rounded-full bg-green-500"></span>
+        </span>
+      </div>
+      <p class="text-sm text-muted-foreground">Public repositories fetched live from GitHub.</p>
+      <div id="opensourceGrid" class="opensource-grid mt-2 grid gap-4 md:grid-cols-2" data-fallback='[{"name":"ISSR","description":"Open-source project exploring software development and practical implementations.","language":"Code"},{"name":"RenAIssance","description":"AI-focused repository experimenting with generative models and intelligent systems.","language":"AI"},{"name":"X-AutoFollowBack","description":"Automatically follows new followers on X (Twitter).","language":"Automation"},{"name":"machine-learning","description":"A collection of machine learning practice projects, implementations, and assignments.","language":"ML"},{"name":"jwt-analyzer","description":"Tool for analyzing and inspecting JSON Web Tokens.","language":"Security"},{"name":"achievements","description":"Collection of achievements, certifications, and milestone tracking.","language":"Docs"}]'>
+        
+      </div>
+      <div class="mt-4 text-center">
+        <a href="https://github.com/Deepthanush1337" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 rounded-full border border-border bg-background px-4 py-2 text-sm font-medium transition-all hover:bg-secondary hover:shadow-sm">
+          <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"/><path d="M9 18c-4.51 2-5-2-7-2"/></svg>
+          View all repositories
+        </a>
+      </div>
+    </section>
+
+    <section id="github" class="mb-16 flex min-h-0 flex-col gap-y-3 scroll-mt-28">
+      <div class="flex items-center justify-between">
+        <h2 class="text-xl font-bold">GitHub Activity</h2>
+        <span id="activityTotal" class="inline-flex items-center gap-2 rounded-full border border-border bg-secondary px-3.5 py-1.5 text-sm font-semibold text-secondary-foreground">
+          <span class="relative flex h-2.5 w-2.5">
+            <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-400 opacity-75"></span>
+            <span class="relative inline-flex h-2.5 w-2.5 rounded-full bg-green-500"></span>
+          </span>
+          <span id="activityTotalText">Loading...</span>
+        </span>
+      </div>
+      <div class="overflow-hidden rounded-lg border border-border bg-card p-4 shadow-sm">
+        <div id="activityChart" class="activity-chart">
+          <div class="activity-calendar">
+            <div class="activity-months" id="activityMonths"></div>
+            <div class="activity-body">
+              <div class="activity-days-label" id="activityDaysLabel"></div>
+              <div class="activity-grid" id="activityGrid"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="skills" class="mb-16 flex min-h-0 flex-col gap-y-3 scroll-mt-28">
+      <h2 class="text-xl font-bold">Skills</h2>
+      <div class="mt-2 space-y-4">
+        
+        <div class="flex flex-wrap gap-2" id="skillFilters">
+          <button class="filter-btn active" data-filter="all">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="14.31" x2="20.05" y1="8" y2="17.94"/><line x1="9.69" x2="21.17" y1="8" y2="8"/><line x1="7.38" x2="13.12" y1="12" y2="2.06"/><line x1="9.69" x2="3.95" y1="16" y2="6.06"/><line x1="14.31" x2="2.83" y1="16" y2="16"/><line x1="16.62" x2="10.88" y1="12" y2="21.94"/></svg>
+            <span>All Skills</span>
+            <span class="filter-count">7</span>
+          </button>
+          <button class="filter-btn" data-filter="ai">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4.5a2.5 2.5 0 0 0-4.96-.46 2.5 2.5 0 0 0-1.98 3 2.5 2.5 0 0 0-1.32 4.24 3 3 0 0 0 .34 5.58 2.5 2.5 0 0 0 2.96 3.08 2.5 2.5 0 0 0 4.91.05L12 20V4.5Z"/><path d="M16 8V5c0-1.1.9-2 2-2"/><path d="M12 13h4"/><path d="M12 18h6a2 2 0 0 1 2 2v1"/><path d="M12 8h8"/><path d="M20.5 8a.5.5 0 1 1-1 0 .5.5 0 0 1 1 0Z"/><path d="M16.5 13a.5.5 0 1 1-1 0 .5.5 0 0 1 1 0Z"/></svg>
+            <span>AI/ML</span>
+            <span class="filter-count">1</span>
+          </button>
+          <button class="filter-btn" data-filter="languages">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m5 8 6 6"/><path d="m4 14 6-6 2-3"/><path d="M2 5h12"/><path d="M7 2h1"/><path d="m22 22-5-10-5 10"/><path d="M14 18h6"/></svg>
+            <span>Languages</span>
+            <span class="filter-count">2</span>
+          </button>
+          <button class="filter-btn" data-filter="cloud">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.5 19c0-1.7-1.3-3-3-3h-11a3 3 0 0 1-3-3c0-1.6 1.2-2.9 2.8-3A4.5 4.5 0 0 1 12 6.5c.8 0 1.5.2 2.1.6A5 5 0 0 1 21 11.5a4 4 0 0 1-3.5 3.9V15h-1.5c-1.7 0-3 1.3-3 3h7.5"/></svg>
+            <span>Cloud</span>
+            <span class="filter-count">1</span>
+          </button>
+          <button class="filter-btn" data-filter="tools">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+            <span>Tools</span>
+            <span class="filter-count">3</span>
+          </button>
+          <button class="filter-btn" data-filter="libraries">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m4 6 8-4 8 4"/><path d="m4 17 8 4 8-4"/><path d="M4 12h16"/><path d="M12 2v20"/></svg>
+            <span>Libraries</span>
+            <span class="filter-count">7</span>
+          </button>
+        </div>
+
+        <div class="flex flex-wrap gap-2" id="skillsGrid">
+          <span class="skill-tag" data-category="ai"><img class="skill-icon" src="https://cdn.simpleicons.org/tensorflow/171717" alt="Machine Learning" loading="lazy">Machine Learning</span>
+          <span class="skill-tag" data-category="cloud"><img class="skill-icon" src="https://cdn.simpleicons.org/docker/171717" alt="Docker" loading="lazy">Docker</span>
+          <span class="skill-tag" data-category="tools"><img class="skill-icon" src="https://cdn.simpleicons.org/github/171717" alt="GitHub" loading="lazy">GitHub</span>
+          <span class="skill-tag" data-category="tools"><img class="skill-icon" src="https://cdn.simpleicons.org/git/171717" alt="Git" loading="lazy">Git</span>
+          <span class="skill-tag" data-category="languages"><img class="skill-icon" src="https://cdn.simpleicons.org/python/171717" alt="Python" loading="lazy">Python</span>
+          <span class="skill-tag" data-category="languages"><img class="skill-icon" src="https://cdn.simpleicons.org/mysql/171717" alt="SQL" loading="lazy">SQL</span>
+          <span class="skill-tag" data-category="tools"><img class="skill-icon" src="https://cdn.simpleicons.org/linux/171717" alt="Linux" loading="lazy">Linux</span>
+
+          <span class="skill-tag hidden-lib" data-category="libraries"><img class="skill-icon" src="https://cdn.simpleicons.org/flask/171717" alt="Flask" loading="lazy">Flask</span>
+          <span class="skill-tag hidden-lib" data-category="libraries"><img class="skill-icon" src="https://cdn.simpleicons.org/python/171717" alt="Requests" loading="lazy">Requests</span>
+          <span class="skill-tag hidden-lib" data-category="libraries"><img class="skill-icon" src="https://cdn.simpleicons.org/pandas/171717" alt="Pandas" loading="lazy">Pandas</span>
+          <span class="skill-tag hidden-lib" data-category="libraries"><img class="skill-icon" src="https://cdn.simpleicons.org/numpy/171717" alt="Numpy" loading="lazy">Numpy</span>
+          <span class="skill-tag hidden-lib" data-category="libraries"><img class="skill-icon" src="https://cdn.simpleicons.org/python/171717" alt="Seaborn" loading="lazy">Seaborn</span>
+          <span class="skill-tag hidden-lib" data-category="libraries"><img class="skill-icon" src="https://cdn.simpleicons.org/python/171717" alt="Matplotlib" loading="lazy">Matplotlib</span>
+          <span class="skill-tag hidden-lib" data-category="libraries"><img class="skill-icon" src="https://cdn.simpleicons.org/scikitlearn/171717" alt="Scikit Learn" loading="lazy">Scikit Learn</span>
+        </div>
+      </div>
+    </section>
+
+    <section id="education" class="mb-16 flex min-h-0 flex-col gap-y-3 scroll-mt-28">
+      <h2 class="text-xl font-bold">Education</h2>
+      <div class="rounded-lg border border-border bg-card p-4 shadow-sm transition-all duration-300 hover:shadow-md">
+        <div class="flex items-start gap-3">
+          <div class="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-full border border-border bg-secondary">
+            <img src="assets/images/klu-logo.webp" alt="KL University logo" class="h-full w-full object-contain p-0.5">
+          </div>
+          <div class="flex-1">
+            <div class="flex flex-col justify-between gap-1 md:flex-row md:items-center">
+              <h3 class="text-base font-semibold">KL University</h3>
+              <span class="text-sm tabular-nums text-muted-foreground">2026 — 2030</span>
+            </div>
+            <p class="mt-1 font-mono text-sm text-muted-foreground">Bachelor's in Computer Science & Engineering</p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer id="contact" class="border-t border-border bg-secondary/30 py-6">
+    <div class="mx-auto max-w-4xl px-4 text-center">
+      <p class="text-xs text-muted-foreground"></p>
+    </div>
+  </footer>
+
+  <div id="toast" class="fixed bottom-6 left-1/2 z-50 -translate-x-1/2 translate-y-20 transform rounded-full border border-border bg-foreground px-5 py-2.5 text-sm font-medium text-background opacity-0 shadow-lg transition-all duration-300 pointer-events-none">
+    Email copied to clipboard!
+  </div>
+
+  <script src="assets/js/main.js"></script>
+</body>
+</html>
