@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Auto WiFi Login — never touch the Sophos portal again</title>
+<meta name="description" content="One-click auto-login for KL University's Sophos captive portal. Runs hidden in your system tray and signs you in automatically.">
+<link rel="icon" type="image/png" href="./icon.png">
+<style>
+  :root {
+    --bg: #0a0e13;
+    --card: #10151d;
+    --card-2: #141a24;
+    --border: #1f2a38;
+    --text: #e5e7eb;
+    --muted: #9ca3af;
+    --cyan: #22d3ee;
+    --blue: #3b82f6;
+    --green: #22c55e;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  img { max-width: 100%; height: auto; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: "Segoe UI", Inter, system-ui, -apple-system, sans-serif;
+    line-height: 1.6;
+    overflow-x: hidden;
+  }
+  .glow {
+    position: fixed; inset: 0; pointer-events: none; z-index: 0;
+    background:
+      radial-gradient(600px 400px at 20% -5%, rgba(34,211,238,.10), transparent 60%),
+      radial-gradient(700px 500px at 85% 10%, rgba(59,130,246,.09), transparent 60%);
+  }
+  .wrap { position: relative; z-index: 1; max-width: 1080px; margin: 0 auto; padding: 0 24px; }
+
+  /* ---------------- nav ---------------- */
+  nav {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 22px 0;
+  }
+  .brand { display: flex; align-items: center; gap: 12px; text-decoration: none; }
+  .brand img { width: 34px; height: 34px; }
+  .brand span {
+    font-weight: 700; font-size: 18px;
+    background: linear-gradient(90deg, var(--cyan), var(--blue));
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+  }
+  .navlink {
+    color: var(--muted); text-decoration: none; font-size: 14px;
+    border: 1px solid var(--border); border-radius: 999px; padding: 7px 16px;
+    transition: .2s;
+  }
+  .navlink:hover { color: var(--cyan); border-color: var(--cyan); }
+
+  /* ---------------- hero ---------------- */
+  header { text-align: center; padding: 72px 0 48px; }
+  .badge {
+    display: inline-block; font-size: 13px; color: var(--cyan);
+    border: 1px solid rgba(34,211,238,.35); background: rgba(34,211,238,.08);
+    border-radius: 999px; padding: 5px 14px; margin-bottom: 22px;
+  }
+  h1 {
+    font-size: clamp(34px, 6vw, 58px); font-weight: 800; line-height: 1.15;
+    letter-spacing: -0.5px;
+  }
+  h1 .grad {
+    background: linear-gradient(90deg, var(--cyan), var(--blue));
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+  }
+  .sub {
+    color: var(--muted); font-size: clamp(15px, 2.2vw, 18px);
+    max-width: 640px; margin: 18px auto 34px;
+  }
+  .cta-row { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
+  .btn {
+    display: inline-flex; align-items: center; gap: 10px;
+    font-weight: 700; font-size: 15px; text-decoration: none;
+    border-radius: 12px; padding: 14px 26px; transition: .2s;
+  }
+  .btn-primary {
+    background: linear-gradient(90deg, var(--cyan), var(--blue)); color: #06232a;
+    box-shadow: 0 8px 30px rgba(34,211,238,.25);
+  }
+  .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 12px 40px rgba(34,211,238,.4); }
+  .btn-ghost { border: 1px solid var(--border); color: var(--text); background: var(--card); }
+  .btn-ghost:hover { border-color: var(--cyan); color: var(--cyan); }
+  .meta { color: var(--muted); font-size: 13px; margin-top: 16px; font-family: Consolas, monospace; }
+
+  /* ---------------- screenshot ---------------- */
+  .shot { text-align: center; padding: 20px 0 30px; }
+  .shot img {
+    width: min(430px, 88vw); border-radius: 18px; border: 1px solid var(--border);
+    box-shadow: 0 0 0 8px rgba(34,211,238,.04), 0 30px 80px rgba(34,211,238,.12), 0 20px 50px rgba(0,0,0,.6);
+  }
+
+  /* ---------------- sections ---------------- */
+  section { padding: 56px 0 12px; }
+  h2 { font-size: clamp(24px, 4vw, 32px); font-weight: 800; text-align: center; letter-spacing: -.3px; }
+  .section-sub { color: var(--muted); text-align: center; margin: 10px auto 36px; max-width: 560px; font-size: 15px; }
+
+  /* ---------------- download cards ---------------- */
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(230px, 100%), 1fr)); gap: 18px; }
+  .card {
+    position: relative; background: var(--card); border: 1px solid var(--border);
+    border-radius: 16px; padding: 26px 22px; transition: .2s;
+    display: flex; flex-direction: column; gap: 6px;
+  }
+  .card:hover { transform: translateY(-4px); border-color: rgba(34,211,238,.5); box-shadow: 0 16px 40px rgba(0,0,0,.45); }
+  .card.disabled { opacity: .55; }
+  .card.disabled:hover { transform: none; border-color: var(--border); box-shadow: none; }
+  .card .os-icon { width: 44px; height: 44px; margin-bottom: 12px; }
+  .card.disabled .os-icon { filter: grayscale(1); }
+  .card h3 { font-size: 18px; font-weight: 700; }
+  .card .desc { color: var(--muted); font-size: 13.5px; flex: 1; }
+  .card .sha { color: var(--muted); font-size: 11px; font-family: Consolas, monospace; opacity: .8; }
+  .ribbon {
+    position: absolute; top: -11px; right: 16px;
+    background: linear-gradient(90deg, var(--cyan), var(--blue)); color: #06232a;
+    font-size: 11.5px; font-weight: 800; border-radius: 999px; padding: 3px 12px;
+  }
+  .dl-btn {
+    margin-top: 14px; text-align: center; text-decoration: none;
+    font-weight: 700; font-size: 14px; border-radius: 10px; padding: 11px;
+    background: linear-gradient(90deg, var(--cyan), var(--blue)); color: #06232a;
+    transition: .2s;
+  }
+  .dl-btn:hover { filter: brightness(1.1); }
+  .soon {
+    margin-top: 14px; text-align: center; font-weight: 700; font-size: 13px;
+    border: 1px dashed var(--border); color: var(--muted);
+    border-radius: 10px; padding: 11px;
+  }
+
+  /* ---------------- features ---------------- */
+  .feat { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(280px, 100%), 1fr)); gap: 18px; }
+  .feat .card:hover { transform: none; border-color: var(--border); box-shadow: none; }
+  .feat img { width: 26px; height: 26px; margin-bottom: 10px; }
+  .feat h3 { font-size: 15.5px; }
+  .feat p { color: var(--muted); font-size: 13.5px; }
+
+  /* ---------------- steps ---------------- */
+  .steps { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(260px, 100%), 1fr)); gap: 18px; }
+  .step {
+    background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 26px 22px;
+  }
+  .step .num {
+    width: 38px; height: 38px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 800; color: #06232a; margin-bottom: 14px;
+    background: linear-gradient(135deg, var(--cyan), var(--blue));
+  }
+  .step h3 { font-size: 15.5px; margin-bottom: 6px; }
+  .step p { color: var(--muted); font-size: 13.5px; }
+  .step code {
+    background: var(--card-2); border: 1px solid var(--border); border-radius: 6px;
+    padding: 1px 7px; font-size: 12.5px; color: var(--cyan);
+  }
+
+  /* ---------------- notes ---------------- */
+  .notes { max-width: 720px; margin: 0 auto; display: flex; flex-direction: column; gap: 12px; }
+  .note {
+    background: var(--card); border: 1px solid var(--border); border-left: 3px solid var(--cyan);
+    border-radius: 10px; padding: 14px 18px; color: var(--muted); font-size: 13.5px;
+  }
+  .note b { color: var(--text); }
+
+  /* ---------------- footer ---------------- */
+  footer {
+    margin-top: 72px; padding: 28px 0 34px; text-align: center;
+    color: var(--muted); font-size: 13px; border-top: 1px solid var(--border);
+  }
+  footer a { color: var(--cyan); text-decoration: none; }
+  footer a:hover { text-decoration: underline; }
+
+  @media (max-width: 560px) {
+    header { padding: 48px 0 36px; }
+    .cta-row { flex-direction: column; align-items: stretch; }
+    .cta-row .btn { width: 100%; justify-content: center; }
+  }
+  /* very narrow phones: keep the nav row on one line */
+  @media (max-width: 380px) {
+    .brand span { font-size: 16px; }
+    .navlink { font-size: 13px; padding: 6px 13px; }
+  }
+</style>
+</head>
+<body>
+<div class="glow"></div>
+<div class="wrap">
+
+  <nav>
+    <a class="brand" href="./">
+      <img src="./icon.png" alt="Auto WiFi Login icon">
+      <span>Auto WiFi Login</span>
+    </a>
+    <a class="navlink" href="https://deepthanush.io">deepthanush.io</a>
+  </nav>
+
+  <header>
+    <div class="badge">v1.0 · built for KL University</div>
+    <h1>Never touch the <span class="grad">Sophos portal</span> again.</h1>
+    <p class="sub">
+      A tiny tray app that signs you into the campus WiFi for you — at boot,
+      after class, every time the portal kicks you off. Set it up once and
+      forget the login page exists.
+    </p>
+    <div class="cta-row">
+      <a class="btn btn-primary" href="./AutoWifiLogin.exe" download>
+        <img src="./icons/windows.png" width="18" height="18" alt="">
+        Download for Windows
+      </a>
+      <a class="btn btn-ghost" href="#how">How it works</a>
+    </div>
+    <div class="meta">AutoWifiLogin.exe · 23.5 MB · Windows 10 / 11</div>
+  </header>
+
+  <div class="shot">
+    <img src="./screenshot.png" alt="Auto WiFi Login dashboard showing a successful connection">
+  </div>
+
+  <section id="download">
+    <h2>Download</h2>
+    <p class="section-sub">Free, open, and your credentials never leave your PC —
+      they're stored encrypted with Windows DPAPI, tied to your Windows account.</p>
+    <div class="grid">
+
+      <div class="card">
+        <div class="ribbon">RECOMMENDED</div>
+        <img class="os-icon" src="./icons/windows.png" alt="Windows logo">
+        <h3>Windows</h3>
+        <div class="desc">x64 · Windows 10 &amp; 11 · single-file EXE, no Python or install needed</div>
+        <div class="sha">SHA-256&nbsp; 6a42c43746b0…</div>
+        <a class="dl-btn" href="./AutoWifiLogin.exe" download>Download · 23.5 MB</a>
+      </div>
+
+      <div class="card">
+        <img class="os-icon" src="./icons/windows.png" alt="Windows ARM64 logo">
+        <h3>Windows ARM64</h3>
+        <div class="desc">Surface Pro X &amp; other ARM PCs · same installer, runs via x64 emulation</div>
+        <div class="sha">SHA-256&nbsp; 6a42c43746b0…</div>
+        <a class="dl-btn" href="./AutoWifiLogin.exe" download>Download · 23.5 MB</a>
+      </div>
+
+      <div class="card disabled">
+        <img class="os-icon" src="./icons/apple.svg" alt="Apple logo">
+        <h3>macOS</h3>
+        <div class="desc">The current build uses Windows-only APIs (DPAPI, registry autostart). A Mac version is on the list.</div>
+        <div class="soon">Coming soon</div>
+      </div>
+
+      <div class="card disabled">
+        <img class="os-icon" src="./icons/linux.svg" alt="Linux logo">
+        <h3>Linux</h3>
+        <div class="desc">Linux build isn't packaged yet. The portal API is simple — ping me if you want a script.</div>
+        <div class="soon">Coming soon</div>
+      </div>
+
+    </div>
+  </section>
+
+  <section>
+    <h2>Why it's good</h2>
+    <p class="section-sub">Built by a KLU student who got tired of the portal page one too many times.</p>
+    <div class="feat">
+      <div class="card">
+        <img src="./icons/bolt.png" alt="">
+        <h3>Instant auto-login</h3>
+        <p>A background monitor notices the moment the portal blocks you and signs you back in within seconds — with smart retry backoff.</p>
+      </div>
+      <div class="card">
+        <img src="./icons/power.png" alt="">
+        <h3>Hidden startup</h3>
+        <p>Launches silently with Windows, straight into the system tray. No console windows, no interruptions.</p>
+      </div>
+      <div class="card">
+        <img src="./icons/radar.png" alt="">
+        <h3>Portal auto-detect</h3>
+        <p>Preconfigured for captiveportal.kluniversity.in, and it can sniff out the portal address on other networks too.</p>
+      </div>
+      <div class="card">
+        <img src="./icons/gauge.png" alt="">
+        <h3>Keep-alive pings</h3>
+        <p>Periodic session keep-alives so the portal doesn't idle you out in the middle of something important.</p>
+      </div>
+      <div class="card">
+        <img src="./icons/save.png" alt="">
+        <h3>Encrypted credentials</h3>
+        <p>Your password is sealed with Windows DPAPI — only your Windows account can decrypt it. Nothing is sent anywhere but the portal.</p>
+      </div>
+      <div class="card">
+        <img src="./icons/eye-off.png" alt="">
+        <h3>Private by design</h3>
+        <p>No accounts, no analytics, no cloud. It's a local app talking to exactly one server: the university portal.</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="how">
+    <h2>Up and running in a minute</h2>
+    <p class="section-sub">One-time setup. After this, the login page is history.</p>
+    <div class="steps">
+      <div class="step">
+        <div class="num">1</div>
+        <h3>Download &amp; run</h3>
+        <p>Grab the EXE and open it. Windows SmartScreen may flag it (it's unsigned) — click <code>More info → Run anyway</code>.</p>
+      </div>
+      <div class="step">
+        <div class="num">2</div>
+        <h3>Enter your credentials</h3>
+        <p>In the <code>Settings</code> tab, type your university ID and password, keep <code>Launch on Windows startup</code> on, and hit Save.</p>
+      </div>
+      <div class="step">
+        <div class="num">3</div>
+        <h3>That's it</h3>
+        <p>Every boot: WiFi joins → the app signs you in → you never see the portal page again. Manage it anytime from the tray icon.</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Good to know</h2>
+    <div class="notes" style="margin-top: 36px;">
+      <div class="note"><b>Works on campus WiFi only.</b> The portal is reachable only from the university network — that's where every login happens.</div>
+      <div class="note"><b>Your account, your responsibility.</b> Use it only with your own credentials. University data quotas and session limits still apply.</div>
+      <div class="note"><b>Everyone can use their own login.</b> Each Windows user profile stores its own encrypted credentials, so one laptop can serve multiple students.</div>
+    </div>
+  </section>
+
+  <footer>
+    Built for KLU students · <a href="https://deepthanush.io">deepthanush.io</a> · <span id="y"></span>
+  </footer>
+
+</div>
+<script>document.getElementById('y').textContent = new Date().getFullYear();</script>
+</body>
+</html>

@@ -315,7 +315,7 @@ img { max-width: 100%; }
   gap: 3px;
   background: none;
   border: none;
-  color: var(--text-faint);
+  color: #a5aebd; /* >= 4.5:1 on the nav bg (WCAG AA for small labels) */
   font-size: 0.66rem;
   font-weight: 600;
   padding: 6px 2px;
@@ -534,7 +534,7 @@ img { max-width: 100%; }
   margin: 1px;
 }
 
-.tt-cell-class .tt-code { font-weight: 700; font-size: 0.78rem; display: block; }
+.tt-cell-class .tt-code { font-weight: 700; font-size: 0.74rem; display: block; word-break: keep-all; overflow-wrap: normal; hyphens: none; }
 .tt-cell-class .tt-meta { display: block; font-size: 0.66rem; color: var(--text-dim); margin-top: 2px; }
 
 .tt-cell-class.now {
@@ -942,6 +942,16 @@ img { max-width: 100%; }
   #toast-container { bottom: var(--sp-6); }
 
   .kv-grid { grid-template-columns: 1fr 1fr; }
+}
+
+/* Compact header for narrow-desktop range (iPad portrait etc.) so all
+   nav buttons + logout stay reachable without horizontal overflow */
+@media (min-width: 768px) and (max-width: 899px) {
+  .app-header-inner { gap: var(--sp-2); padding-left: var(--sp-3); padding-right: var(--sp-3); }
+  .app-brand-name { display: none; }
+  .nav-btn { padding: var(--sp-2) 8px; font-size: 0.78rem; gap: 6px; }
+  .nav-btn svg { width: 18px; height: 18px; }
+  #logout-btn .logout-label { display: none; }
 }
 
 /* ============ Reduced motion ============ */

@@ -460,8 +460,8 @@ function renderDashboard() {
       <div class="stat-card">
         <div class="stat-icon"><i data-lucide="shield-alert"></i></div>
         <div class="stat-label">Attendance risk</div>
-        <div class="stat-value ${pct != null && pct < 75 ? "pct-bad" : "pct-good"}">
-          ${pct == null ? "—" : pct < 75 ? "Low" : "Safe"}</div>
+        <div class="stat-value ${pct == null ? "" : pct < 75 ? "pct-bad" : "pct-good"}">
+          ${pct == null ? "—" : pct < 75 ? "At risk" : "Safe"}</div>
         <div class="stat-hint">75% is the minimum</div>
       </div>
       <div class="stat-card">
