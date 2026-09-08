@@ -1,0 +1,297 @@
+/* ============================================================
+   cards.css — bento card primitives
+   Scope: .bento / .bento-head / .bento-title / .bento-actions /
+          .bento-body / .bento-empty / .skel / .seg / .day-chips
+   Tokens (--panel, --line, --acc, --ease, …) live in tokens.css.
+   Keyframes (shimmer) live in motion.css — referenced only.
+   No media queries here: responsive.css owns them all.
+   ============================================================ */
+
+/* ---------- Card shell ---------- */
+
+.bento {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 20px;
+  overflow: hidden;
+  background: var(--panel, rgba(255, 255, 255, 0.03));
+  border: 1px solid var(--line, rgba(255, 255, 255, 0.08));
+  border-radius: var(--r-lg, 20px);
+  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(14px);
+  /* hover lifts + deepens shadow only — the border never changes, so no
+     border-color leg here; theme cross-fades ride html.theme-anim instead */
+  transition:
+    transform 0.35s var(--ease, cubic-bezier(0.22, 1, 0.36, 1)),
+    box-shadow 0.3s var(--ease, cubic-bezier(0.22, 1, 0.36, 1));
+}
+
+/* Top sheen — inset hairline + soft vertical light falloff */
+.bento::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  box-shadow: inset 0 0 0 1px transparent;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.05),
+    transparent 30%
+  );
+  pointer-events: none;
+}
+
+.bento:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow, 0 12px 44px rgba(0, 0, 0, 0.5));
+}
+
+/* ---------- Card header ---------- */
+
+.bento-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.bento-title {
+  margin: 0;
+  font-family: var(--font-d, 'Space Grotesk', 'Inter', system-ui, sans-serif);
+  font-weight: 700;
+  font-size: 22px;
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+  color: var(--ink, #f2f4f8);
+}
+
+/* Accent period — “Now.” / “Tasks.” */
+.bento-title .pdot {
+  color: var(--acc, #c8ff00);
+}
+
+.bento-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+/* ---------- Card body ---------- */
+
+.bento-body {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Opt-in scroll for long content */
+.bento-body.scroll {
+  overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-width: thin;
+  scrollbar-color: var(--line2, rgba(255, 255, 255, 0.16)) transparent;
+}
+
+.bento-body.scroll::-webkit-scrollbar {
+  width: 6px;
+}
+
+.bento-body.scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.bento-body.scroll::-webkit-scrollbar-thumb {
+  background: var(--line2, rgba(255, 255, 255, 0.16));
+  border-radius: 999px;
+}
+
+.bento-body.scroll::-webkit-scrollbar-thumb:hover {
+  background: var(--muted, rgba(255, 255, 255, 0.32));
+}
+
+/* ---------- Empty state ---------- */
+
+.bento-empty {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 44px 28px;
+  text-align: center;
+  border: 1px dashed var(--line, rgba(255, 255, 255, 0.08));
+  border-radius: var(--r-md, 12px);
+  font-family: var(--font-m, 'JetBrains Mono', 'SFMono-Regular', monospace);
+  font-size: 12px;
+  line-height: 1.6;
+  color: var(--muted, rgba(255, 255, 255, 0.45));
+}
+
+/* Structured empty copy (built by ui/today.js): a readable title over a
+   faint sub-line, both quieter than shouting the default mono block */
+.bento-empty-title {
+  font-family: var(--font-b, 'Inter', system-ui, sans-serif);
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.4;
+  color: var(--text, #f2f4f8);
+}
+
+.bento-empty-sub {
+  margin-top: -6px; /* tighten the 12px flex gap between title and sub */
+  font-size: 11px;
+  color: var(--faint, rgba(255, 255, 255, 0.32));
+}
+
+/* Quiet ghost glyph above the empty-state copy */
+.bento-empty .ghost {
+  display: block;
+  width: 28px;
+  height: 28px;
+  font-size: 28px;
+  line-height: 1;
+  color: var(--muted, rgba(255, 255, 255, 0.45));
+  opacity: 0.3;
+}
+
+.bento-empty .ghost svg,
+.bento-empty > svg {
+  width: 28px;
+  height: 28px;
+  stroke-width: 1.25;
+}
+
+/* ---------- Skeleton loaders ---------- */
+
+.skel {
+  height: 12px;
+  border-radius: 6px;
+  background: linear-gradient(
+    90deg,
+    var(--panel2, rgba(255, 255, 255, 0.05)) 25%,
+    var(--line, rgba(255, 255, 255, 0.08)) 50%,
+    var(--panel2, rgba(255, 255, 255, 0.05)) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.4s infinite;
+}
+
+.skel + .skel {
+  margin-top: 10px;
+}
+
+.skel.w40 { width: 40%; }
+.skel.w60 { width: 60%; }
+.skel.w80 { width: 80%; }
+
+/* ---------- Segmented control ---------- */
+
+.seg {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  padding: 3px;
+  background: var(--panel, rgba(255, 255, 255, 0.03));
+  border: 1px solid var(--line, rgba(255, 255, 255, 0.08));
+  border-radius: 10px;
+}
+
+.seg button {
+  appearance: none;
+  border: 0;
+  background: transparent;
+  padding: 7px 12px;
+  border-radius: 7px;
+  font-family: var(--font-m, 'JetBrains Mono', 'SFMono-Regular', monospace);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  color: var(--muted, rgba(255, 255, 255, 0.45));
+  cursor: pointer;
+  transition:
+    background 0.2s var(--ease, cubic-bezier(0.22, 1, 0.36, 1)),
+    color 0.2s var(--ease, cubic-bezier(0.22, 1, 0.36, 1));
+}
+
+.seg button:hover:not(.on) {
+  color: var(--ink, #f2f4f8);
+  background: var(--panel2, rgba(255, 255, 255, 0.07)); /* same wash as .btn-ghost/.pop-row hover */
+}
+
+.seg button.on {
+  background: var(--acc, #c8ff00);
+  color: #0a0a0a;
+  font-weight: 700;
+}
+
+.seg button:focus-visible {
+  outline: 2px solid var(--acc, #c8ff00);
+  outline-offset: 2px;
+}
+
+/* ---------- Day chips (week card) ---------- */
+
+.day-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.day-chips button {
+  appearance: none;
+  background: transparent;
+  border: 1px solid var(--line, rgba(255, 255, 255, 0.08));
+  border-radius: 8px;
+  padding: 6px 10px;
+  font-family: var(--font-m, 'JetBrains Mono', 'SFMono-Regular', monospace);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  color: var(--muted, rgba(255, 255, 255, 0.45));
+  cursor: pointer;
+  transition:
+    background 0.2s var(--ease, cubic-bezier(0.22, 1, 0.36, 1)),
+    color 0.2s var(--ease, cubic-bezier(0.22, 1, 0.36, 1)),
+    border-color 0.2s var(--ease, cubic-bezier(0.22, 1, 0.36, 1));
+}
+
+.day-chips button:hover:not(.on) {
+  color: var(--ink, #f2f4f8);
+  border-color: var(--line2, rgba(255, 255, 255, 0.16));
+}
+
+.day-chips button.on {
+  background: var(--acc, #c8ff00);
+  border-color: var(--acc, #c8ff00);
+  color: #0a0a0a;
+  font-weight: 700;
+}
+
+.day-chips button:focus-visible {
+  outline: 2px solid var(--acc, #c8ff00);
+  outline-offset: 2px;
+}
+
+/* “Today” marker — 4px accent dot trailing the label
+   (JS appends an empty <span class="today-dot"> inside today's chip) */
+.day-chips .today-dot::after {
+  content: '';
+  display: inline-block;
+  width: 4px;
+  height: 4px;
+  margin-left: 5px;
+  vertical-align: middle;
+  border-radius: 50%;
+  background: var(--acc, #c8ff00);
+}
+
+/* Keep the dot legible when the chip is active (accent bg) */
+.day-chips button.on .today-dot::after {
+  background: #0a0a0a;
+}

@@ -1,0 +1,211 @@
+{
+  "student": {
+    "id": "2600031735",
+    "semester": "Odd",
+    "year": "2026-27"
+  },
+  "meta": {
+    "generated": "2026-08-15",
+    "source": "fetched live from KL ERP (fetch-timetable), slot times from FED classwork timings",
+    "note": "full week synced"
+  },
+  "slots": {
+    "1": [
+      "07:10",
+      "08:00"
+    ],
+    "2": [
+      "08:00",
+      "08:50"
+    ],
+    "3": [
+      "09:20",
+      "10:10"
+    ],
+    "4": [
+      "10:10",
+      "11:00"
+    ],
+    "5": [
+      "11:10",
+      "12:00"
+    ],
+    "6": [
+      "12:00",
+      "12:50"
+    ],
+    "7": [
+      "13:00",
+      "13:50"
+    ],
+    "8": [
+      "13:50",
+      "14:40"
+    ],
+    "9": [
+      "14:50",
+      "15:40"
+    ],
+    "10": [
+      "15:40",
+      "16:30"
+    ]
+  },
+  "breaks": [
+    {
+      "start": "08:50",
+      "end": "09:20",
+      "label": "break"
+    },
+    {
+      "start": "11:00",
+      "end": "11:10",
+      "label": "break"
+    },
+    {
+      "start": "12:50",
+      "end": "13:00",
+      "label": "lunch"
+    },
+    {
+      "start": "14:40",
+      "end": "14:50",
+      "label": "break"
+    }
+  ],
+  "courses": {
+    "26SC1101": {
+      "name": "Problem Solving Using Programming (Java)",
+      "short": "JAVA",
+      "color": "#c8ff00"
+    },
+    "26MT1101": {
+      "name": "Mathematics for Computation",
+      "short": "MATH",
+      "color": "#8b5cf6"
+    },
+    "26UC1137": {
+      "name": "Design Thinking for Innovation & Entrepreneurship",
+      "short": "DTIE",
+      "color": "#2dd4ff"
+    },
+    "26UC1102": {
+      "name": "Language Skills for Engineers",
+      "short": "LANG",
+      "color": "#f5a623"
+    }
+  },
+  "week": {
+    "mon": [
+      {
+        "start": "13:00",
+        "end": "14:40",
+        "slots": "7–8",
+        "course": "26UC1137",
+        "type": "P",
+        "section": "S-35",
+        "room": "S708"
+      }
+    ],
+    "tue": [
+      {
+        "start": "13:00",
+        "end": "14:40",
+        "slots": "7–8",
+        "course": "26UC1137",
+        "type": "P",
+        "section": "S-35",
+        "room": "S708"
+      },
+      {
+        "start": "14:50",
+        "end": "16:30",
+        "slots": "9–10",
+        "course": "26SC1101",
+        "type": "L",
+        "section": "S-36",
+        "room": "F108"
+      }
+    ],
+    "wed": [
+      {
+        "start": "07:10",
+        "end": "08:50",
+        "slots": "1–2",
+        "course": "26MT1101",
+        "type": "L",
+        "section": "S-33",
+        "room": "F207"
+      },
+      {
+        "start": "14:50",
+        "end": "16:30",
+        "slots": "9–10",
+        "course": "26SC1101",
+        "type": "S",
+        "section": "S-36",
+        "room": "F108"
+      }
+    ],
+    "thu": [
+      {
+        "start": "07:10",
+        "end": "08:50",
+        "slots": "1–2",
+        "course": "26MT1101",
+        "type": "T",
+        "section": "S-33",
+        "room": "F207"
+      },
+      {
+        "start": "14:50",
+        "end": "16:30",
+        "slots": "9–10",
+        "course": "26SC1101",
+        "type": "S",
+        "section": "S-36",
+        "room": "F108"
+      }
+    ],
+    "fri": [
+      {
+        "start": "13:00",
+        "end": "14:40",
+        "slots": "7–8",
+        "course": "26UC1102",
+        "type": "P",
+        "section": "S-36",
+        "room": "F303"
+      },
+      {
+        "start": "14:50",
+        "end": "16:30",
+        "slots": "9–10",
+        "course": "26SC1101",
+        "type": "S",
+        "section": "S-36",
+        "room": "C118B"
+      }
+    ],
+    "sat": [
+      {
+        "start": "13:00",
+        "end": "14:40",
+        "slots": "7–8",
+        "course": "26UC1102",
+        "type": "P",
+        "section": "S-36",
+        "room": "F002"
+      },
+      {
+        "start": "14:50",
+        "end": "16:30",
+        "slots": "9–10",
+        "course": "26SC1101",
+        "type": "S",
+        "section": "S-36",
+        "room": "C118B"
+      }
+    ]
+  }
+}

@@ -1,0 +1,139 @@
+/* ============================================================
+   motion.css — keyframes & animation utilities
+   Owns: ALL @keyframes, .reveal (+ .d1–.d8), .anim-pop,
+   .anim-float, bento entrance stagger, reduced-motion opt-out.
+   Other sheets reference keyframes by name only:
+   rise, pop, shimmer, pulse-dot, ring-draw, slide-up, strike,
+   float, confetti-fall, spin, wk-pulse, pal-fade, sync-fade, sync-pop.
+   Timing/easing via tokens: var(--ease). No :root vars here.
+   ============================================================ */
+
+/* ---------- keyframes ---------- */
+
+/* primary entrance: fade + rise + subtle settle scale */
+@keyframes rise {
+  from { opacity: 0; transform: translateY(16px) scale(.98); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* celebratory pop: .9 → overshoot 1.04 → 1 */
+@keyframes pop {
+  0%   { transform: scale(.9); }
+  60%  { transform: scale(1.04); }
+  100% { transform: scale(1); }
+}
+
+/* highlight sweep across a 200%-wide gradient background */
+@keyframes shimmer {
+  from { background-position: 200% 0; }
+  to   { background-position: -200% 0; }
+}
+
+/* expanding ring on a 6px "live" dot (matches --live #ff4d8d) */
+@keyframes pulse-dot {
+  0%   { box-shadow: 0 0 0 0 rgba(255, 77, 141, .55); }
+  70%  { box-shadow: 0 0 0 6px rgba(255, 77, 141, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(255, 77, 141, 0); }
+}
+
+/* SVG progress ring — consumer sets --ring-from (start dashoffset,
+   usually the circumference) and optionally --ring-to (default 0) */
+@keyframes ring-draw {
+  from { stroke-dashoffset: var(--ring-from, 100); }
+  to   { stroke-dashoffset: var(--ring-to, 0); }
+}
+
+/* toast entrance */
+@keyframes slide-up {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* task strike-through line (animate a width-based ::after) */
+@keyframes strike {
+  from { width: 0; }
+  to   { width: 100%; }
+}
+
+/* gentle idle bob, ±4px */
+@keyframes float {
+  0%, 100% { transform: translateY(-4px); }
+  50%      { transform: translateY(4px); }
+}
+
+/* optional DOM-confetti fallback (primary confetti is canvas-based) */
+@keyframes confetti-fall {
+  0%   { opacity: 1; transform: translate3d(0, -10vh, 0) rotate(0deg); }
+  100% { opacity: .6; transform: translate3d(0, 110vh, 0) rotate(720deg); }
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* week-grid nowline opacity pulse (consumer: week.css .wk-nowline) */
+@keyframes wk-pulse {
+  0%, 100% { opacity: 1; }
+  50%      { opacity: 0.35; }
+}
+
+/* command-palette overlay fade-in (consumer: palette.css #tt-palette) */
+@keyframes pal-fade {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* sync modal overlay fade-in (consumer: sync.css .sync-overlay) */
+@keyframes sync-fade {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* sync modal card entrance (consumer: sync.css .sync-card) */
+@keyframes sync-pop {
+  from { opacity: 0; transform: translateY(10px) scale(.96); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* ---------- utilities ---------- */
+
+.reveal { animation: rise .5s var(--ease) both; }
+
+/* stagger steps, 60ms each */
+.d1 { animation-delay: 60ms; }
+.d2 { animation-delay: 120ms; }
+.d3 { animation-delay: 180ms; }
+.d4 { animation-delay: 240ms; }
+.d5 { animation-delay: 300ms; }
+.d6 { animation-delay: 360ms; }
+.d7 { animation-delay: 420ms; }
+.d8 { animation-delay: 480ms; }
+
+.anim-pop   { animation: pop .45s var(--ease) both; }
+.anim-float { animation: float 6s ease-in-out infinite; }
+
+/* ---------- bento entrance stagger ---------- */
+
+.bento-grid > .bento { animation: rise .55s var(--ease) both; }
+.bento-grid > .bento:nth-child(1) { animation-delay: 40ms; }
+.bento-grid > .bento:nth-child(2) { animation-delay: 80ms; }
+.bento-grid > .bento:nth-child(3) { animation-delay: 120ms; }
+.bento-grid > .bento:nth-child(4) { animation-delay: 160ms; }
+.bento-grid > .bento:nth-child(5) { animation-delay: 200ms; }
+.bento-grid > .bento:nth-child(6) { animation-delay: 240ms; }
+.bento-grid > .bento:nth-child(7) { animation-delay: 280ms; }
+.bento-grid > .bento:nth-child(8) { animation-delay: 320ms; }
+
+/* ---------- reduced motion: kill all motion (canonical — the only
+   @media block allowed outside responsive.css) ---------- */
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *, *::before, *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+}

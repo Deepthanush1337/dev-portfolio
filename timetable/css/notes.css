@@ -1,0 +1,79 @@
+/* ============================================================
+   notes.css — scratchpad card (#tt-notes)
+   Scope: .notes-pad (auto-growing textarea), .notes-count
+   (word count), focus glow on the card shell.
+   Tokens (--text, --faint, --acc, --glow, …) live in tokens.css.
+   No keyframes here (motion.css owns them; it also owns the
+   global reduced-motion opt-out). No media queries — the pad is
+   fluid (width:100%) so none are needed.
+   ============================================================ */
+
+/* ---------- the pad ---------- */
+
+.notes-pad {
+  display: block;
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 96px;
+  max-height: 320px; /* JS caps growth here and flips overflow-y to auto */
+  padding: 2px 0 22px; /* bottom room keeps text clear of the word count */
+  margin: 0;
+  background: transparent;
+  border: 0;
+  outline: none;
+  resize: none;
+  font-family: var(--font-m, 'JetBrains Mono', monospace);
+  font-size: 13px;
+  line-height: 1.7;
+  color: var(--text, #f5f6fa);
+  caret-color: var(--acc, #c8ff00);
+  overflow-y: hidden;
+  scrollbar-width: thin;
+  scrollbar-color: var(--line2, rgba(255, 255, 255, 0.16)) transparent;
+}
+
+.notes-pad::placeholder {
+  color: var(--faint, #62626f);
+  opacity: 1;
+}
+
+.notes-pad::selection {
+  background: color-mix(in srgb, var(--acc, #c8ff00) 24%, transparent);
+}
+
+.notes-pad::-webkit-scrollbar {
+  width: 6px;
+}
+
+.notes-pad::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.notes-pad::-webkit-scrollbar-thumb {
+  background: var(--line2, rgba(255, 255, 255, 0.16));
+  border-radius: 999px;
+}
+
+/* ---------- subtle focus glow on the card ----------
+   Border never changes (cards.css rule of the house); the glow is
+   pure box-shadow, animated by .bento's existing shadow transition. */
+
+#tt-notes:focus-within {
+  box-shadow: var(--glow, 0 0 0 1px rgba(200, 255, 0, 0.3));
+}
+
+/* ---------- word count (bottom-right, faint mono) ----------
+   .bento-body is already position:relative (cards.css) */
+
+.notes-count {
+  position: absolute;
+  right: 2px;
+  bottom: 0;
+  font-family: var(--font-m, 'JetBrains Mono', monospace);
+  font-size: 10px;
+  line-height: 1;
+  letter-spacing: 0.04em;
+  color: var(--faint, #62626f);
+  pointer-events: none;
+  user-select: none;
+}

@@ -1,0 +1,236 @@
+/* ============================================================
+   responsive.css — ALL media queries live here (loaded last)
+   Scopes only via overrides of other modules' classes.
+   Breakpoints: 1080px (6-col bento) · 760px (single col) · 420px · 380px
+   ============================================================ */
+
+/* ---------- ≤1080px : 6-column bento ---------- */
+@media (max-width: 1080px) {
+  .bento-grid { grid-template-columns: repeat(6, 1fr); }
+
+  /* remap desktop spans onto the 6-col grid — spans must stay ≤6:
+     a wider span would create implicit tracks and crush the 1fr columns */
+  .s3  { grid-column: span 3; }
+  .s4  { grid-column: span 3; }
+  .s5  { grid-column: span 6; }
+  .s7  { grid-column: span 6; }
+  .s12 { grid-column: span 6; }
+  .r2  { grid-row: auto; }
+}
+
+/* ---------- ≤760px : single column ---------- */
+@media (max-width: 760px) {
+
+  /* topbar (padding lives on .topbar-inner since the HTML wrapper exists) */
+  .topbar-inner     { padding: 12px 16px; }
+  .brand-word       { font-size: 17px; }
+  #tt-date          { display: none; }
+  #tt-search-btn kbd { display: none; }
+  /* brand + clock + 5 actions overflow one phone-width row — space-between
+     would pull the clock over the brand word at 381–479px */
+  .topbar-clock     { display: none; }
+
+  /* the live .focus-mini chip + 6 icon buttons outgrow a phone-width row:
+     pin the brand, let the actions row shrink and scroll horizontally
+     (scrollbar hidden) instead of crushing the brand to width 0 */
+  .brand            { flex: 0 0 auto; }
+  .topbar-actions {
+    flex: 0 1 auto;
+    min-width: 0;
+    max-width: 100%;
+    overflow-x: auto;
+    scrollbar-width: none; /* firefox */
+  }
+  .topbar-actions::-webkit-scrollbar { display: none; }
+
+  /* grid → one column, everything full width */
+  .bento-grid {
+    grid-template-columns: 1fr;
+    padding: 0 14px;
+    margin-top: 18px;
+    gap: 12px;
+  }
+  .s1, .s2, .s3, .s4, .s5, .s6,
+  .s7, .s8, .s9, .s10, .s11, .s12, .r2 {
+    grid-column: 1 / -1;
+    grid-row: auto;
+  }
+
+  /* cards */
+  .bento { padding: 16px; border-radius: 16px; }
+
+  /* now card */
+  .now-count { font-size: 36px; }
+
+  /* week card: JS wraps .wk-grid in .wk-scroll for horizontal scroll */
+  .wk-scroll { overflow-x: auto; }
+  #tt-week-body { overflow-x: auto; } /* fallback if the wrapper is absent */
+  .wk-grid   { min-width: 560px; }
+  .wa-row    { grid-template-columns: 76px 1fr; }
+
+  /* week card header: let the controls drop below the title and
+     keep the 6 day chips reachable via horizontal scroll */
+  #tt-week .bento-head { flex-wrap: wrap; }
+  #tt-week .bento-actions {
+    flex: 1 1 100%;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+  }
+  #tt-week .day-chips {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    max-width: 100%;
+    padding-bottom: 2px;
+  }
+
+  /* tasks: form wraps, category select drops to its own full row —
+     targets the custom .ttsel wrapper (moved from select.css); the native
+     #tt-task-cat source select is sr-only and out of the flex flow */
+  #tt-task-form               { flex-wrap: wrap; }
+  #tt-task-input              { min-width: 0; }
+  #tt-task-form [type="submit"] { order: 2; flex: 0 0 auto; white-space: nowrap; }
+  .ttsel[data-ttsel="tt-task-cat"] { order: 3; flex: 1 1 100%; }
+
+  /* when-row wraps onto multiple lines on phones — hide the en-dash sep
+     so it can't strand at a line's right edge; the start/end inputs
+     wrap onto shared rows as plain peers */
+  #tt-task-form .task-when     { flex-wrap: wrap; }
+  #tt-task-form .task-when-sep { display: none; }
+
+  /* iOS Safari auto-zooms on focus when input font-size < 16px —
+     the gate fields, task day/time pickers (start + end), goal input,
+     focus custom minutes and the notes pad join the original four */
+  #tt-task-input,
+  #tt-task-cat,
+  #tt-focus-task,
+  #tt-palette-input,
+  #tt-auth-user,
+  #tt-auth-pass,
+  #tt-auth-year,
+  #tt-auth-sem,
+  #tt-task-day,
+  #tt-task-form .task-time,
+  #tt-task-form .task-time-end,
+  #tt-goals .goal-input,
+  .focus-custom-in,
+  .notes-pad                  { font-size: 16px; }
+
+  /* tap targets ≥ 40px (brief minimum) — pills grow for real… */
+  .day-chips button,
+  .seg button,
+  #tt-tasks .task-filter {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 40px;
+  }
+  /* …focus preset/break chips + topbar mini timer + task day/time pickers grow too… */
+  .focus-chip,
+  .focus-mini,
+  #tt-task-day,
+  #tt-task-form .task-time { min-height: 40px; }
+  /* …custom dropdown trigger + option rows grow too (moved from select.css) */
+  .ttsel-btn,
+  .ttsel-opt { min-height: 40px; }
+  /* …small square buttons keep their look but gain a bigger hit area */
+  #tt-tasks .task-check,
+  #tt-tasks .task-del { position: relative; }
+  #tt-tasks .task-check::after,
+  #tt-tasks .task-del::after {
+    content: "";
+    position: absolute;
+    inset: -9px; /* 22/28px box → ≈40px hit area */
+  }
+  /* goals check square (22px) + delete (28px) — same ::after expansion */
+  #tt-goals .goal-check,
+  #tt-goals .goal-del { position: relative; }
+  #tt-goals .goal-check::after,
+  #tt-goals .goal-del::after {
+    content: "";
+    position: absolute;
+    inset: -9px -6px; /* → ≈40px hit area both axes */
+  }
+  .sync-x::after {
+    content: "";
+    position: absolute;
+    inset: -4px; /* 32px box → 40px hit area */
+  }
+  /* timeline mini checkbox: 18px box → ≈40px hit area */
+  #tt-today .tl-check { position: relative; }
+  #tt-today .tl-check::after {
+    content: "";
+    position: absolute;
+    inset: -11px;
+  }
+  /* focus custom-minutes apply: 26px box → 40px hit area */
+  #tt-focus .focus-custom-go { position: relative; }
+  #tt-focus .focus-custom-go::after {
+    content: "";
+    position: absolute;
+    inset: -7px;
+  }
+
+  /* focus dial: shrink the wrap (svg scales via width:100%);
+     the svg rule doubles as a fallback if the wrap is absent */
+  .focus-dial-wrap { width: 128px; height: 128px; }
+  #tt-focus-dial svg { width: 128px; height: 128px; }
+  .focus-time { font-size: 28px; }
+  .focus-dial-wrap .focus-mode { transform: translateY(11px); }
+
+  /* stats */
+  #tt-stats-body .stat-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+
+  /* command palette → bottom sheet */
+  #tt-palette {
+    padding: 8vh 0 0;
+    align-items: flex-end;
+  }
+  #tt-palette .palette-panel {
+    width: 100%;
+    max-width: 100%;
+    max-height: 92vh;
+    border-radius: 16px 16px 0 0;
+    padding-bottom: env(safe-area-inset-bottom, 0px); /* clear the home indicator */
+  }
+
+  /* toasts: full width + home-indicator clearance */
+  #tt-toasts {
+    left: 14px;
+    right: 14px;
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  #tt-toasts .toast { width: 100%; max-width: none; }
+
+  /* footer: home-indicator clearance */
+  .footer { padding-bottom: calc(24px + env(safe-area-inset-bottom, 0px)); }
+}
+
+/* ---------- ≤420px : sync modal tightens (moved from sync.css) ---------- */
+@media (max-width: 420px) {
+  .sync-overlay { padding: 14px; }
+  .sync-card    { padding: 20px; }
+  .sync-title   { font-size: 21px; }
+}
+
+/* ---------- ≤380px : small phones ---------- */
+@media (max-width: 380px) {
+  .now-course     { font-size: 24px; }
+  #tt-stats-body .stat-num { font-size: 24px; }
+  .topbar-actions { gap: 6px; }
+  /* tile alone carries the brand — leaves real room for the 6 buttons
+     + focus-mini chip in the scrolling actions row */
+  .brand-word     { display: none; }
+}
+
+/* ---------- touch: no hover — keep delete affordances visible ---------- */
+@media (hover: none) {
+  #tt-tasks .task-del { opacity: 1; }
+  #tt-planner .plan-x { opacity: 1; }
+  #tt-goals .goal-del { opacity: 1; }
+  /* the check square's :hover accent never fires on touch — keep a
+     permanent hint so the toggle reads as tappable */
+  #tt-goals .goal:not(.is-done) .goal-check {
+    border-color: var(--acc2);
+    background: color-mix(in srgb, var(--acc2) 14%, transparent);
+  }
+}

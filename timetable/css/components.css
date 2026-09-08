@@ -1,0 +1,149 @@
+/* ============================================================
+   components.css — shared overlays & misc atoms
+   Scope: #tt-toasts/.toast, #tt-popover/.pop-row, [data-tip]
+   tooltips, .badge-live, .cdot, #tt-confetti, #tt-search-btn kbd
+   Tokens (:root) live in tokens.css; keyframes live in motion.css.
+   No media queries here — responsive.css owns all of them.
+   ============================================================ */
+
+/* ---------- Toasts (bottom-right stack) ---------- */
+#tt-toasts {
+  position: fixed;
+  right: 20px;
+  bottom: 20px;
+  z-index: 120;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  pointer-events: none; /* stack itself click-through; toasts re-enable if needed */
+}
+
+.toast {
+  max-width: 320px;
+  padding: 12px 16px;
+  font-size: 13px;
+  line-height: 1.45;
+  color: var(--fg, #f2f4f8);
+  background: var(--bg2);
+  border: 1px solid var(--line);
+  border-left: 3px solid var(--acc);
+  border-radius: 12px;
+  box-shadow: var(--shadow);
+  animation: slide-up 0.3s var(--ease);
+  pointer-events: auto;
+  overflow-wrap: anywhere;
+}
+
+.toast.err {
+  border-left-color: var(--live);
+}
+
+/* ---------- Popover (floating mini-menu) ---------- */
+#tt-popover {
+  position: absolute;
+  z-index: 110;
+  min-width: 200px;
+  padding: 6px;
+  background: var(--bg2);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  box-shadow: var(--shadow);
+  animation: pop 0.15s var(--ease);
+}
+
+.pop-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border-radius: 8px;
+  font-family: var(--mono, ui-monospace, SFMono-Regular, Menlo, monospace);
+  font-size: 12px;
+  cursor: pointer;
+  user-select: none;
+  transition: background 0.12s var(--ease);
+}
+
+.pop-row:hover {
+  background: var(--panel2);
+}
+
+.pop-row svg {
+  width: 15px;
+  height: 15px;
+  flex-shrink: 0;
+  color: var(--muted, #8a90a3);
+}
+
+/* ---------- [data-tip] tooltips (pure CSS, above element) ---------- */
+[data-tip] {
+  position: relative;
+}
+
+[data-tip]::after {
+  content: attr(data-tip);
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  z-index: 140;
+  padding: 5px 10px;
+  font-family: var(--mono, ui-monospace, SFMono-Regular, Menlo, monospace);
+  font-size: 10px;
+  line-height: 1.4;
+  white-space: nowrap;
+  color: var(--fg, #f2f4f8);
+  background: var(--bg2);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  box-shadow: var(--shadow);
+  pointer-events: none;
+  opacity: 0;
+  transform: translateX(-50%) translateY(2px);
+  transition: opacity 0.15s var(--ease), transform 0.15s var(--ease);
+}
+
+[data-tip]:hover::after,
+[data-tip]:focus-visible::after {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+/* ---------- Live badge ---------- */
+.badge-live {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 7px;
+  border-radius: 6px;
+  font-family: var(--mono, ui-monospace, SFMono-Regular, Menlo, monospace);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--live);
+  background: color-mix(in srgb, var(--live) 16%, transparent);
+}
+
+/* ---------- Colored dot (course legend etc.) ---------- */
+.cdot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: var(--c, var(--acc));
+}
+
+/* ---------- Confetti canvas (full-screen celebration layer) ---------- */
+#tt-confetti {
+  position: fixed;
+  inset: 0;
+  z-index: 130;
+  pointer-events: none;
+}
+
+/* ---------- ⌘K hint inside the search button ---------- */
+#tt-search-btn kbd {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}

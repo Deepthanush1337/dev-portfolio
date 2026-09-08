@@ -1,0 +1,106 @@
+/* ==========================================================================
+   tokens.css — design tokens for deeptt v2
+   Owns ALL :root custom properties. Every other stylesheet consumes
+   var(--…) and must never redeclare these.
+   ========================================================================== */
+
+:root {
+  /* colors — surfaces */
+  --bg: #07070b;
+  --bg2: #0c0c13;
+  --panel: rgba(255, 255, 255, .04);
+  --panel2: rgba(255, 255, 255, .07);
+  --line: rgba(255, 255, 255, .08);
+  --line2: rgba(255, 255, 255, .16);
+
+  /* colors — text */
+  --text: #f5f6fa;
+  --muted: #9b9bac;
+  --faint: #62626f;
+
+  /* colors — accents & states */
+  --acc: #c8ff00;
+  --acc2: #8b5cf6;
+  --live: #ff4d8d;
+  --good: #4ade80;
+  --warn: #fbbf24;
+
+  /* signature gradient (follows theme via --acc/--acc2) */
+  --grad: linear-gradient(135deg, var(--acc), var(--acc2));
+
+  /* radii */
+  --r-lg: 20px;
+  --r-md: 14px;
+  --r-sm: 9px;
+
+  /* shadows & glow */
+  --shadow: 0 12px 44px rgba(0, 0, 0, .5);
+  --glow: 0 0 0 1px color-mix(in srgb, var(--acc) 30%, transparent),
+          0 10px 36px color-mix(in srgb, var(--acc) 14%, transparent);
+
+  /* fonts (loaded by the shell via Google Fonts) */
+  --font-d: 'Space Grotesk', sans-serif;
+  --font-b: 'Inter', sans-serif;
+  --font-m: 'JetBrains Mono', monospace;
+
+  /* easing — springy, buttery */
+  --ease: cubic-bezier(.2, .9, .25, 1.15);
+
+  /* layout metrics — additive (v3 clean pass); consumed by layout.css */
+  --topbar-h: 58px;
+
+  /* ------------------------------------------------------------------
+     Compatibility aliases — component sheets reference these names;
+     keep them mapped to the canonical tokens above so every var()
+     resolves and theme remaps reach all consumers.
+     ------------------------------------------------------------------ */
+  --mono: var(--font-m);
+  --font: var(--font-b);
+  --font-mono: var(--font-m);
+  --font-display: var(--font-d);
+  --font-disp: var(--font-d);
+  --font-sans: var(--font-b);
+  --mut: var(--muted);
+  --txt: var(--text);
+  --ink: var(--text);
+  --fg: var(--text);
+  --glass: var(--panel);
+
+  /* ring-draw keyframe params (motion.css) — consumers may override locally */
+  --ring-from: 100;
+  --ring-to: 0;
+}
+
+/* --------------------------------------------------------------------------
+   Theme remaps — set as a class on <html> by ui/theme.js.
+   Only the accent pair changes; --grad and --glow follow automatically.
+   -------------------------------------------------------------------------- */
+html.theme-violet {
+  --acc: #a78bfa;
+  --acc2: #22d3ee;
+}
+
+html.theme-rose {
+  --acc: #fb7185;
+  --acc2: #f59e0b;
+}
+
+/* --------------------------------------------------------------------------
+   Dark scheme for native UI bits (scrollbars, form controls).
+   -------------------------------------------------------------------------- */
+html {
+  color-scheme: dark;
+}
+
+/* --------------------------------------------------------------------------
+   Theme switch animation — JS adds .theme-anim to <html> for the duration
+   of a theme change so every surface cross-fades instead of snapping.
+   -------------------------------------------------------------------------- */
+html.theme-anim *,
+html.theme-anim *::before,
+html.theme-anim *::after {
+  transition: color 200ms ease,
+              background-color 200ms ease,
+              border-color 200ms ease,
+              box-shadow 200ms ease !important;
+}

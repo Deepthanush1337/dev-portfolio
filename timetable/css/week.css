@@ -1,0 +1,693 @@
+/* ============================================================
+   week.css — #tt-week-body (grid mode .wk-* / day mode .wa-*)
+   Owns: week timetable grid, break bands, nowline, day agenda
+   rows, timed task markers (.wk-task / .wa-task), .tt-dim
+   filter support.
+   Tokens from tokens.css; keyframes (wk-pulse) referenced from
+   motion.css — none declared here. No media queries either:
+   responsive.css owns them (it sets .wk-grid min-width ≤760px).
+
+   JS contract (ui/week.js):
+   .wk-scroll > .wk-grid >
+     .wk-gutter(.wk-ghead + .wk-gtrack > .wk-hour ×11, 07:00–17:00)
+     + .wk-days(> .wk-bands > .wk-break[.is-roomy > .wk-break-label])
+       > .wk-daycol(.is-today/.is-empty)
+         > .wk-dayhead(.wk-dayname + .wk-count)
+         + .wk-daytrack > .wk-block(.wk-top > .wk-code + .wk-type,
+             .wk-room, .wk-time shown when .is-tall)
+           + .wk-task(.is-done; tasks with an end → .is-range range
+             strip > .wk-tbox + .wk-tname + .wk-ttime shown when
+             .is-tall) + .wk-nowline
+   day mode: .wa-rows > .wa-row[data-code](.is-live/.is-past)
+             | .wa-row.wa-break | .wa-row.wa-gap (.wa-note)
+             | .wa-row.wa-task(.is-done/.is-past >
+                 .wa-tbox + .wa-tname + .wa-tag [+ .wa-sub duration])
+
+   LAYOUT INVARIANT: .wk-gtrack, .wk-bands and every .wk-daytrack
+   are exactly 10 × var(--wk-pitch) = 480px tall (07:00–17:00),
+   so the JS %-positioned hours, blocks, bands, task strips and
+   nowline land pixel-perfect on the hour stripes. --wk-head is
+   the fixed head band above the tracks; it keeps dayheads off
+   the 07:10 blocks and offsets .wk-bands so bands line up with
+   the tracks.
+   ============================================================ */
+
+#tt-week-body {
+  --wk-pitch: 48px;  /* one hour stripe */
+  --wk-head: 34px;   /* day-head band above the tracks */
+}
+
+/* ============================ GRID MODE ============================ */
+
+/* horizontal scroll wrapper (JS wraps .wk-grid; responsive.css gives
+   .wk-grid a 560px min-width ≤760px so the 6 days stay reachable) */
+.wk-scroll {
+  overflow-x: auto;
+  max-width: 100%;
+}
+
+/* grid body: hour gutter + the 6-day region */
+.wk-grid {
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr);
+  gap: 8px;
+}
+
+/* gutter stays pinned when the ≤760px grid scrolls horizontally
+   (inert on desktop: .wk-scroll only overflows below 760px); the
+   solid bg keeps scrolled blocks/bands from bleeding through */
+.wk-gutter {
+  position: sticky;
+  left: 0;
+  z-index: 5;
+  background: var(--bg);
+}
+
+/* ---------- hour gutter ---------- */
+
+/* invisible spacer, same height as the dayheads, so the gutter track
+   aligns with the day tracks below */
+.wk-ghead {
+  height: var(--wk-head);
+}
+
+.wk-gtrack {
+  position: relative;
+  height: calc(var(--wk-pitch) * 10);
+  user-select: none;
+}
+
+/* labels sit ON their stripe line; first/last stay inside the track */
+.wk-hour {
+  position: absolute;
+  right: 6px;
+  transform: translateY(-50%);
+  font-family: var(--font-m);
+  font-size: 9px;
+  line-height: 1;
+  letter-spacing: 0.02em;
+  font-variant-numeric: tabular-nums;
+  color: var(--muted);
+}
+
+.wk-hour:first-child { transform: none; }
+.wk-hour:last-child { transform: translateY(-100%); }
+
+/* ---------- days region ---------- */
+
+.wk-days {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 6px;
+}
+
+/* ---------- break bands (data.breaks) ----------
+   one hatched band per break, spanning all 6 columns; rendered before
+   the columns so stripes/tints/blocks paint above it; click-through */
+.wk-bands {
+  position: absolute;
+  top: var(--wk-head);
+  left: 0;
+  right: 0;
+  height: calc(var(--wk-pitch) * 10);
+  pointer-events: none;
+}
+
+.wk-break {
+  position: absolute;
+  left: 0;
+  right: 0;
+  pointer-events: none;
+  background-color: rgba(255, 255, 255, 0.02);
+  background-image: repeating-linear-gradient(
+    45deg,
+    rgba(255, 255, 255, 0.06) 0,
+    rgba(255, 255, 255, 0.06) 1px,
+    transparent 1px,
+    transparent 7px
+  );
+  border-top: 1px solid rgba(255, 255, 255, 0.04);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+/* tiny centered label — JS adds .is-roomy when the band is ≥20px tall
+   (the 30-min morning break at the default 48px pitch); sized for a
+   single mono line inside a 20–24px band */
+.wk-break-label {
+  display: none;
+  height: 100%;
+  padding: 0 6px;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-m);
+  font-size: 8px;
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  overflow: hidden;
+  color: var(--faint);
+}
+
+.wk-break.is-roomy .wk-break-label {
+  display: flex;
+}
+
+/* ---------- day column ---------- */
+
+.wk-daycol {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+/* head: weekday + class count, pinned above the track */
+.wk-dayhead {
+  height: var(--wk-head);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1px;
+  user-select: none;
+}
+
+.wk-dayname {
+  font-family: var(--font-m);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  line-height: 1.2;
+  color: var(--muted);
+}
+
+.wk-count {
+  font-family: var(--font-m);
+  font-size: 8px;
+  line-height: 1.2;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+}
+
+.wk-daycol.is-today .wk-dayname {
+  color: var(--acc);
+}
+
+/* today: accent dot under the head */
+.wk-daycol.is-today .wk-dayhead::after {
+  content: "";
+  display: block;
+  width: 4px;
+  height: 4px;
+  margin-top: 2px;
+  border-radius: 50%;
+  background: var(--acc);
+  box-shadow: 0 0 6px var(--acc);
+}
+
+/* the 480px scheduling area: 10 hour stripes, blocks inside */
+.wk-daytrack {
+  position: relative;
+  height: calc(var(--wk-pitch) * 10);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background-color: transparent;
+  background-image: linear-gradient(var(--line) 1px, transparent 1px);
+  background-size: 100% var(--wk-pitch);
+  overflow: hidden;
+}
+
+/* today's column — neutral white wash + accent hairline (an --acc wash
+   camouflages same-hue course blocks, e.g. JAVA in the default theme) */
+.wk-daycol.is-today .wk-daytrack {
+  border-color: color-mix(in srgb, var(--acc) 32%, var(--line));
+  background-color: rgba(255, 255, 255, 0.03);
+}
+
+/* day with no classes — dashed shell with a faint placeholder dash */
+.wk-daycol.is-empty .wk-daytrack {
+  border-style: dashed;
+  background-color: color-mix(in srgb, var(--bg2) 55%, transparent);
+}
+
+.wk-daycol.is-empty .wk-daytrack::after {
+  content: "—";
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  color: var(--faint);
+  opacity: 0.5;
+}
+
+/* ---------- class block ---------- (top/height set inline by JS) */
+.wk-block {
+  position: absolute;
+  z-index: 2; /* above the nowline (z 1), below task strips (z 3) */
+  left: 3px;
+  right: 3px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 5px 7px;
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--c, var(--acc2)) 16%, var(--bg2));
+  border-left: 3px solid var(--c, var(--acc2));
+  text-align: left;
+  color: var(--text);
+  overflow: hidden;
+  cursor: pointer;
+  transition: transform 0.2s var(--ease), filter 0.2s var(--ease);
+}
+
+.wk-block:hover {
+  transform: scale(1.04);
+  filter: brightness(1.15);
+  z-index: 2;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35);
+}
+
+.wk-block:focus-visible {
+  outline: 2px solid var(--c, var(--acc));
+  outline-offset: 1px;
+  z-index: 2;
+}
+
+/* first line: short code + type chip */
+.wk-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 4px;
+  min-width: 0;
+}
+
+.wk-code {
+  font-family: var(--font-d);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  line-height: 1.25;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* single-letter type chip (L/P/S/T), tinted with the course color */
+.wk-type {
+  flex: none;
+  padding: 1px 4px;
+  border-radius: 4px;
+  font-family: var(--font-m);
+  font-size: 8px;
+  font-weight: 700;
+  line-height: 1.4;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--c, var(--acc));
+  background: color-mix(in srgb, var(--c, var(--acc)) 22%, transparent);
+}
+
+.wk-room {
+  font-family: var(--font-m);
+  font-size: 9px;
+  line-height: 1.3;
+  color: var(--muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* 'HH:MM–HH:MM' — JS adds .is-tall when the block is taller than 54px */
+.wk-time {
+  display: none;
+  font-family: var(--font-m);
+  font-size: 9px;
+  line-height: 1.3;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap; /* the 11-char range fits even the 93px mobile column */
+  color: var(--muted);
+  opacity: 0.8;
+}
+
+.wk-block.is-tall .wk-time {
+  display: block;
+}
+
+/* ---------- timed task strip (TT.tasks entries with day + start) ----------
+   one strip per task; JS pins it at the start % via inline top:clamp()
+   (out-of-window tasks stay visible at the track edges). No-end tasks
+   are thin 18px markers (dashed edge); tasks with a valid end render
+   as .is-range range strips with inline height:max(18px, pct) — the
+   same (end-start)/600*100% math as blocks. Sits above the bands,
+   the nowline and the blocks (z 3 > 2 > 1); pointer-events auto
+   so the click → tt:toast delegate sees it even where the strip
+   overlaps a block */
+.wk-task {
+  position: absolute;
+  left: 2px;
+  right: 2px;
+  z-index: 3;
+  height: 18px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 0 5px;
+  border-left: 2px dashed var(--acc2);
+  border-radius: 3px;
+  background: color-mix(in srgb, var(--acc2) 14%, var(--bg2));
+  text-align: left;
+  pointer-events: auto;
+  overflow: hidden;
+  transition: filter 0.2s var(--ease), opacity 0.2s var(--ease);
+}
+
+.wk-task:hover {
+  filter: brightness(1.2);
+}
+
+.wk-task:focus-visible {
+  outline: 1px solid var(--acc2);
+  outline-offset: 1px;
+}
+
+/* 7px hollow-square checkbox glyph — fills when the task is done */
+.wk-tbox {
+  flex: none;
+  width: 7px;
+  height: 7px;
+  border: 1px solid var(--acc2);
+  border-radius: 1px;
+}
+
+/* mono one-line title, ellipsis */
+.wk-tname {
+  flex: 1;
+  min-width: 0;
+  font-family: var(--font-m);
+  font-size: 8px;
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* range variant (task with a valid end): JS sets inline
+   top:clamp() + height:max(18px, (end-start)/600*100%). Solid left
+   edge + clear tint set it apart from the thin dashed marker; the
+   grid layout stacks the time line under the title (box in col 1,
+   name/time in col 2) with the rows centered in the strip */
+.wk-task.is-range {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-content: center;
+  gap: 2px 5px;
+  padding: 3px 5px;
+  border-left-style: solid;
+  background: color-mix(in srgb, var(--acc2) 14%, transparent);
+}
+
+/* 'HH:MM–HH:MM' under the title — JS adds .is-tall when the strip
+   measures ≥ 40px (same measure pass as .wk-block.is-tall) */
+.wk-ttime {
+  display: none;
+  grid-column: 2;
+  font-family: var(--font-m);
+  font-size: 8px;
+  line-height: 1.2;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: var(--muted);
+}
+
+.wk-task.is-range.is-tall .wk-ttime {
+  display: block;
+}
+
+/* done: dimmed, struck through, box filled */
+.wk-task.is-done {
+  opacity: 0.45;
+}
+
+.wk-task.is-done .wk-tbox {
+  background: var(--acc2);
+}
+
+.wk-task.is-done .wk-tname {
+  text-decoration: line-through;
+}
+
+/* ---------- live "now" line (today's track only) ---------- */
+.wk-nowline {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: var(--live);
+  box-shadow: 0 0 8px color-mix(in srgb, var(--live) 70%, transparent);
+  z-index: 1; /* under blocks (z 2) + task strips (z 3) — never strikes text */
+  pointer-events: none;
+  animation: wk-pulse 2.4s ease-in-out infinite;
+}
+
+.wk-nowline::before {
+  content: "";
+  position: absolute;
+  left: -1px;
+  top: -3px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--live);
+}
+
+/* ============================ DAY MODE ============================ */
+
+.wa-rows {
+  display: flex;
+  flex-direction: column;
+}
+
+/* one row per class: time cell + body */
+.wa-row {
+  position: relative;
+  display: grid;
+  grid-template-columns: 92px 1fr;
+  gap: 12px;
+  align-items: start;
+  padding: 12px 8px;
+  border-bottom: 1px solid var(--line);
+  border-radius: 8px;
+}
+
+.wa-row:not(.wa-break):not(.wa-gap):last-child {
+  border-bottom: none;
+}
+
+/* class rows are clickable (tt:toast summary) */
+.wa-row[data-code] {
+  cursor: pointer;
+  transition: background 0.18s var(--ease);
+}
+
+.wa-row[data-code]:hover {
+  background: var(--panel2);
+}
+
+/* time cell — mono, accent start / muted end / faint slot caption */
+.wa-time {
+  font-family: var(--font-m);
+  line-height: 1.35;
+  user-select: none;
+}
+
+.wa-start {
+  display: block;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--acc);
+  font-variant-numeric: tabular-nums;
+}
+
+.wa-end {
+  display: block;
+  font-size: 10px;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.wa-slots {
+  display: block;
+  font-size: 9px;
+  color: var(--muted);
+  letter-spacing: 0.04em;
+  margin-top: 3px;
+}
+
+/* body */
+.wa-main {
+  min-width: 0;
+}
+
+.wa-title {
+  font-family: var(--font-d);
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  color: var(--text);
+}
+
+.wa-sub {
+  font-size: 12px;
+  color: var(--muted);
+  margin-top: 2px;
+}
+
+/* live class: pink left bar + faint tint; the chip is .badge-live
+   (components.css), injected/maintained by ui/week.js */
+.wa-row.is-live {
+  padding-left: 10px;
+  background: linear-gradient(90deg, color-mix(in srgb, var(--live) 8%, transparent), transparent 60%);
+}
+
+.wa-row.is-live::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 12px;
+  bottom: 12px;
+  width: 3px;
+  border-radius: 2px;
+  background: var(--live);
+  box-shadow: 0 0 8px color-mix(in srgb, var(--live) 70%, transparent);
+}
+
+.wa-row.is-live .wa-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+/* finished rows fade away */
+.wa-row.is-past {
+  opacity: 0.45;
+}
+
+/* break / free rows between classes — dashed, faint, mono */
+.wa-row.wa-break,
+.wa-row.wa-gap {
+  align-items: center;
+  padding: 7px 10px;
+  margin: 5px 0;
+  border: 1px dashed var(--line);
+  border-radius: 10px;
+}
+
+.wa-break .wa-start,
+.wa-gap .wa-start {
+  color: var(--muted);
+  font-weight: 500;
+}
+
+.wa-break .wa-end,
+.wa-gap .wa-end {
+  color: var(--faint);
+}
+
+/* 'lunch · 10m' / 'free · 1h 40m' */
+.wa-note {
+  font-family: var(--font-m);
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+}
+
+/* ---------- timed task row (TT.tasks entries with day + start) ----------
+   interleaved chronologically with class/break/free rows; clickable
+   (tt:toast) like class rows, dims via .is-past, never goes live
+   (no data-code → refreshRows skips the live badge). Tasks with an
+   end show the real start/end in the time cell and get a .wa-sub
+   duration meta line (reusing the class-row meta style) */
+.wa-row.wa-task {
+  cursor: pointer;
+  transition: background 0.18s var(--ease), opacity 0.3s var(--ease);
+}
+
+.wa-row.wa-task:hover {
+  background: var(--panel2);
+}
+
+/* acc2 start time — the task color cue, matching the grid strips */
+.wa-task .wa-start {
+  color: var(--acc2);
+}
+
+/* slightly subordinate to class titles, single flex line */
+.wa-task .wa-title {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  min-width: 0;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+/* 7px hollow-square marker glyph — fills when the task is done */
+.wa-tbox {
+  flex: none;
+  width: 7px;
+  height: 7px;
+  border: 1px solid var(--acc2);
+  border-radius: 1px;
+}
+
+.wa-tname {
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+/* tiny faint 'task' tag after the title */
+.wa-tag {
+  flex: none;
+  font-family: var(--font-m);
+  font-size: 8px;
+  font-weight: 500;
+  line-height: 1.6;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--faint);
+}
+
+/* done: dimmed, struck through, box filled (.is-past dims the same) */
+.wa-task.is-done {
+  opacity: 0.45;
+}
+
+.wa-task.is-done .wa-tbox {
+  background: var(--acc2);
+}
+
+.wa-task.is-done .wa-tname {
+  text-decoration: line-through;
+}
+
+/* ============================ FILTER DIM ============================ */
+
+/* applied to blocks/rows filtered out by chips or palette */
+.tt-dim {
+  opacity: 0.12;
+  filter: grayscale(1);
+  transition: opacity 0.3s var(--ease), filter 0.3s var(--ease);
+}

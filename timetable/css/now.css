@@ -1,0 +1,247 @@
+/* ============================================================
+   now.css — NOW card (#tt-now)
+   Live class state: course-color ambient bleed, LIVE/FREE badge,
+   tabular-nums countdown + eyebrow, 64px SVG progress ring,
+   stylish idle state.
+   Scope: #tt-now ONLY. Tokens from tokens.css (--acc/--acc2/
+   --live/--line/--text/--muted/--grad/--ease, font stacks),
+   keyframes (pulse-dot) from motion.css. No media queries here
+   (responsive.css owns ALL of them).
+   JS contract: body gets data-state="live|free" on #tt-now-body;
+   body renders .now-badge (.is-live + .now-badge-dot / .is-free),
+   .now-course, .now-meta chips, .now-count, svg.now-ring
+   (track + progress circles), .now-idle-msg / .now-sub.
+   Card-level live styling keys off :has(#tt-now-body[data-state="live"]).
+   ============================================================ */
+
+#tt-now {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  transition:
+    border-color 0.6s var(--ease, cubic-bezier(0.22, 1, 0.36, 1)),
+    box-shadow 0.6s var(--ease, cubic-bezier(0.22, 1, 0.36, 1));
+}
+
+/* --- ambient course-color bleed (fades in only when live) --- */
+#tt-now::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  border-radius: inherit;
+  background: radial-gradient(
+    300px at 80% 0%,
+    color-mix(in srgb, var(--c, var(--acc, #c8ff00)) 14%, transparent),
+    transparent 72%
+  );
+  opacity: 0;
+  transition: opacity 0.8s var(--ease, cubic-bezier(0.22, 1, 0.36, 1));
+  pointer-events: none;
+}
+
+#tt-now:has(#tt-now-body[data-state="live"]) {
+  border-color: color-mix(in srgb, var(--c, var(--acc, #c8ff00)) 26%, var(--line, rgba(255, 255, 255, 0.08)));
+  box-shadow: 0 12px 48px -18px color-mix(in srgb, var(--c, var(--acc, #c8ff00)) 45%, transparent);
+}
+
+#tt-now:has(#tt-now-body[data-state="live"])::after {
+  opacity: 1;
+}
+
+/* keep head + body above the bleed layer */
+#tt-now .bento-head,
+#tt-now .bento-body {
+  position: relative;
+  z-index: 1;
+}
+
+#tt-now-body {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 12px;
+  flex: 1;
+}
+
+/* --- LIVE / FREE badge -------------------------------------------------- */
+.now-badge {
+  display: inline-flex;
+  align-items: center;
+  align-self: flex-start;
+  gap: 8px;
+  width: fit-content;
+  padding: 5px 11px;
+  border-radius: 999px;
+  font-family: var(--font-mono, "JetBrains Mono", ui-monospace, SFMono-Regular, monospace);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--live, #ff4d8d) 80%, #ffffff);
+  border: 1px solid color-mix(in srgb, var(--live, #ff4d8d) 30%, transparent);
+  background: color-mix(in srgb, var(--live, #ff4d8d) 9%, transparent);
+  transition:
+    color 0.4s var(--ease, ease),
+    border-color 0.4s var(--ease, ease),
+    background 0.4s var(--ease, ease);
+}
+
+/* pink pulsing dot (pulse-dot keyframes from motion.css) — JS emits
+   .now-badge-dot inside the LIVE badge */
+.now-badge .now-badge-dot {
+  width: 6px;
+  height: 6px;
+  flex: none;
+  border-radius: 50%;
+  background: var(--live, #ff4d8d);
+  box-shadow: 0 0 8px color-mix(in srgb, var(--live, #ff4d8d) 70%, transparent);
+  animation: pulse-dot 1.6s infinite;
+}
+
+/* idle variant — JS emits .now-badge.is-free: neutral pill, no dot */
+.now-badge.is-free,
+#tt-now-body[data-state="free"] .now-badge {
+  color: var(--muted, #9aa1af);
+  border-color: var(--line, rgba(255, 255, 255, 0.1));
+  background: color-mix(in srgb, var(--text, #ffffff) 4%, transparent);
+}
+
+/* --- course title -------------------------------------------------------- */
+/* JS wraps course/meta/count in .now-main */
+.now-main {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+
+.now-course {
+  margin: 0;
+  font-family: var(--font-display, "Space Grotesk", system-ui, sans-serif);
+  font-size: clamp(26px, 3vw, 34px);
+  font-weight: 700;
+  line-height: 1.08;
+  letter-spacing: -0.02em;
+  color: var(--text, #eef0f4);
+  text-wrap: balance;
+}
+
+/* --- meta chips row (type / section / room) ------------------------------ */
+.now-meta {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.now-meta .chip,
+.now-meta > span {
+  font-family: var(--font-mono, "JetBrains Mono", ui-monospace, SFMono-Regular, monospace);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: var(--muted, #9aa1af);
+  padding: 4px 9px;
+  border: 1px solid var(--line, rgba(255, 255, 255, 0.08));
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--text, #ffffff) 4%, transparent);
+}
+
+/* while live, first chip (class type) picks up the course color */
+#tt-now-body[data-state="live"] .now-meta > :first-child {
+  color: color-mix(in srgb, var(--c, var(--acc, #c8ff00)) 75%, #ffffff);
+  border-color: color-mix(in srgb, var(--c, var(--acc, #c8ff00)) 32%, transparent);
+  background: color-mix(in srgb, var(--c, var(--acc, #c8ff00)) 8%, transparent);
+}
+
+/* --- countdown -----------------------------------------------------------
+   Big JetBrains Mono timer ("ends in MM:SS"). */
+.now-count {
+  font-family: var(--font-mono, "JetBrains Mono", ui-monospace, SFMono-Regular, monospace);
+  font-size: clamp(38px, 4.5vw, 52px);
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  color: var(--text, #eef0f4);
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1;
+}
+
+#tt-now-body[data-state="live"] .now-count {
+  text-shadow: 0 0 28px color-mix(in srgb, var(--c, var(--acc, #c8ff00)) 32%, transparent);
+}
+
+/* --- progress ring (64px SVG, top-right) ---------------------------------
+   Track = var(--line) 5px; progress = var(--c)/--acc. The -90° start
+   offset comes from the rotate() attribute on the JS-emitted progress
+   circle — do NOT rotate the svg here or the arc anchors at 6 o'clock. */
+.now-ring {
+  position: absolute;
+  top: 18px;
+  right: 18px;
+  width: 64px;
+  height: 64px;
+  overflow: visible;
+}
+
+.now-ring circle {
+  fill: none;
+  stroke-width: 5;
+  stroke-linecap: round;
+}
+
+.now-ring .now-ring-track,
+.now-ring circle:first-of-type {
+  stroke: var(--line, rgba(255, 255, 255, 0.08));
+}
+
+.now-ring .now-ring-prog,
+.now-ring .now-ring-progress,
+.now-ring circle:last-of-type {
+  stroke: var(--c, var(--acc, #c8ff00));
+  transition: stroke-dashoffset 1s linear;
+  filter: drop-shadow(0 0 5px color-mix(in srgb, var(--c, var(--acc, #c8ff00)) 55%, transparent));
+}
+
+/* --- idle state ----------------------------------------------------------
+   Big muted 'enjoy the break.' (JS emits .now-idle-msg) + muted sub-line.
+   Free state fills the card: the message block centers vertically in the
+   space under the badge and the display type steps up to the live title's
+   scale, so a FREE s5 r2 card doesn't read as a grid hole. Live state is
+   untouched — both overrides are scoped to [data-state="free"]. */
+#tt-now-body[data-state="free"] .now-main {
+  margin: auto 0; /* vertical centering; left edge stays aligned */
+}
+
+#tt-now-body .now-idle-msg {
+  margin: 0;
+  font-family: var(--font-display, "Space Grotesk", system-ui, sans-serif);
+  font-size: 24px;
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+  color: var(--muted, #9aa1af);
+  text-wrap: balance;
+}
+
+#tt-now-body[data-state="free"] .now-idle-msg {
+  font-size: clamp(26px, 3vw, 34px);
+}
+
+.now-sub {
+  margin: 0;
+  max-width: 36ch;
+  font-family: var(--font-sans, "Inter", system-ui, sans-serif);
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--muted, #9aa1af);
+}
+
+.now-sub strong,
+.now-sub b {
+  font-weight: 600;
+  color: var(--text, #eef0f4);
+}

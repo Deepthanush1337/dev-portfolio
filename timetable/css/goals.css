@@ -1,0 +1,288 @@
+/* goals.css — #tt-goals card scope ONLY.
+   Vars/keyframes from tokens.css + motion.css (strike, rise via .reveal);
+   .btn-acc from base.css; .seg + .bento-empty primitives from cards.css.
+   No media queries here — layout is fluid inside the card. */
+
+/* ---------- progress header (thin bar + mono count + all-done icon) ---------- */
+#tt-goals .goal-progress {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+#tt-goals .goal-progress-bar {
+  flex: 1;
+  min-width: 0;
+  height: 5px;
+  border-radius: 3px;
+  background: var(--panel2);
+  overflow: hidden;
+}
+
+#tt-goals .goal-progress-fill {
+  display: block;
+  height: 100%;
+  width: 0;
+  border-radius: 3px;
+  background: var(--acc);
+  box-shadow: 0 0 8px color-mix(in srgb, var(--acc) 45%, transparent);
+  transition: width 0.5s var(--ease);
+}
+
+#tt-goals .goal-progress-num {
+  flex-shrink: 0;
+  font-family: var(--font-m, "JetBrains Mono", ui-monospace, monospace);
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.03em;
+  color: var(--faint);
+}
+
+#tt-goals .goal-progress-all {
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  color: var(--acc);
+}
+
+#tt-goals .goal-progress-all svg {
+  width: 15px;
+  height: 15px;
+}
+
+/* ---------- checklist ---------- */
+#tt-goals .goal-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  max-height: 320px; /* 12-goal cap scrolls instead of stretching the card */
+  overflow-y: auto;
+  padding-right: 2px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--line2) transparent;
+}
+
+#tt-goals .goal-list::-webkit-scrollbar {
+  width: 6px;
+}
+
+#tt-goals .goal-list::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+#tt-goals .goal-list::-webkit-scrollbar-thumb {
+  background: var(--line2);
+  border-radius: 3px;
+}
+
+/* empty state keeps the list area calm while the form below stays live */
+#tt-goals .goal-list .bento-empty {
+  min-height: 120px;
+}
+
+/* ---------- goal row ---------- */
+#tt-goals .goal {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  border-radius: var(--r-md);
+  border: 1px solid transparent;
+  transition: background-color 0.25s var(--ease), border-color 0.25s var(--ease);
+}
+
+#tt-goals .goal:hover {
+  background: var(--panel2);
+  border-color: var(--line);
+}
+
+/* ---------- check square (22px, accent2 border, drawn-check animation) ---------- */
+#tt-goals .goal-check {
+  width: 22px;
+  height: 22px;
+  border-radius: 7px;
+  border: 1.5px solid color-mix(in srgb, var(--acc2) 55%, transparent);
+  background: transparent;
+  padding: 0;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background-color 0.25s var(--ease), border-color 0.25s var(--ease),
+    transform 0.15s var(--ease);
+}
+
+#tt-goals .goal-check svg {
+  width: 13px;
+  height: 13px;
+}
+
+#tt-goals .goal-check svg path {
+  stroke: var(--bg);
+  stroke-width: 3;
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 24;
+  stroke-dashoffset: 24;
+  transition: stroke-dashoffset 0.3s var(--ease);
+}
+
+#tt-goals .goal:not(.is-done) .goal-check:hover {
+  border-color: var(--acc2);
+  background: color-mix(in srgb, var(--acc2) 14%, transparent);
+}
+
+#tt-goals .goal-check:active {
+  transform: scale(0.88);
+}
+
+#tt-goals .goal-check:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--acc2) 60%, transparent);
+  outline-offset: 2px;
+}
+
+#tt-goals .goal.is-done .goal-check {
+  background: var(--acc2);
+  border-color: transparent;
+}
+
+#tt-goals .goal.is-done .goal-check svg path {
+  stroke-dashoffset: 0;
+}
+
+/* ---------- text (strike + fade on done) ---------- */
+#tt-goals .goal-text {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.35;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  transition: color 0.25s var(--ease), opacity 0.25s var(--ease);
+}
+
+#tt-goals .goal.is-done .goal-text {
+  color: var(--faint);
+  opacity: 0.65;
+}
+
+#tt-goals .goal.is-done .goal-text::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 50%;
+  width: 100%;
+  height: 1.5px;
+  margin-top: -0.75px;
+  border-radius: 1px;
+  background: var(--faint);
+  transform-origin: left center;
+  animation: strike 0.35s var(--ease) both;
+}
+
+/* ---------- delete (hover reveal) ---------- */
+#tt-goals .goal-del {
+  width: 28px;
+  height: 28px;
+  flex-shrink: 0;
+  margin-left: auto;
+  display: grid;
+  place-items: center;
+  opacity: 0;
+  transition: opacity 0.2s var(--ease), color 0.2s var(--ease);
+}
+
+#tt-goals .goal:hover .goal-del,
+#tt-goals .goal:focus-within .goal-del,
+#tt-goals .goal-del:focus-visible {
+  opacity: 1;
+}
+
+#tt-goals .goal-del:hover {
+  color: var(--live);
+}
+
+#tt-goals .goal-del svg {
+  width: 14px;
+  height: 14px;
+}
+
+/* ---------- add form (glass input + icon-only accent button) ---------- */
+#tt-goals .goal-form {
+  display: flex;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+#tt-goals .goal-input {
+  flex: 1;
+  min-width: 0;
+  background: var(--panel2);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 10px 12px;
+  font-family: var(--font-b, "Inter", system-ui, sans-serif);
+  font-size: 13px;
+  line-height: 1.4;
+  color: var(--text);
+  outline: none;
+  transition: border-color 0.2s var(--ease), box-shadow 0.2s var(--ease);
+}
+
+#tt-goals .goal-input::placeholder {
+  color: var(--faint);
+}
+
+#tt-goals .goal-input:focus {
+  border-color: color-mix(in srgb, var(--acc) 55%, transparent);
+  box-shadow:
+    0 0 0 3px color-mix(in srgb, var(--acc) 16%, transparent),
+    0 0 20px color-mix(in srgb, var(--acc) 12%, transparent);
+}
+
+#tt-goals .goal-add {
+  flex-shrink: 0;
+  width: 40px;
+  padding: 0;
+  border-radius: 10px;
+}
+
+#tt-goals .goal-add svg {
+  width: 16px;
+  height: 16px;
+}
+
+/* ---------- footer (mono reset note + streak chip) ---------- */
+#tt-goals .goal-foot {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 10px;
+  font-family: var(--font-m, "JetBrains Mono", ui-monospace, monospace);
+  font-size: 10px;
+  letter-spacing: 0.05em;
+  color: var(--faint);
+}
+
+#tt-goals .goal-streak {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  border: 1px solid color-mix(in srgb, var(--acc) 35%, transparent);
+  background: color-mix(in srgb, var(--acc) 8%, transparent);
+  color: var(--acc);
+  font-variant-numeric: tabular-nums;
+}
+
+#tt-goals .goal-streak svg {
+  width: 11px;
+  height: 11px;
+}

@@ -1,0 +1,11 @@
+{
+  "redirects": [
+    { "source": "/klu", "destination": "/klu/", "statusCode": 308 },
+    { "source": "/timetable", "destination": "/timetable/", "statusCode": 308 }
+  ],
+  "rewrites": [
+    { "source": "/klu/(.*)", "destination": "/klu/$1" },
+    { "source": "/timetable/(.*)", "destination": "/timetable/$1" },
+    { "source": "/(.*)", "destination": "/index.html" }
+  ]
+}

@@ -1,0 +1,150 @@
+/* ==========================================================================
+   palette.css — ⌘K command palette overlay (#tt-palette)
+   Scope: #tt-palette, .palette-panel, #tt-palette-input, #tt-palette-list,
+   .palette-row(.sel), .palette-row-title, .palette-empty, .palette-foot.
+   Consumes tokens from tokens.css; `pop`/`pal-fade` keyframes from motion.css.
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   Overlay — fullscreen dim + blur, panel placed near the top, centered.
+   -------------------------------------------------------------------------- */
+#tt-palette {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: grid;
+  place-items: start center;
+  padding-top: 16vh;
+  background: rgba(4, 4, 8, .6);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  animation: pal-fade .15s ease both;
+}
+
+/* Shell toggles visibility with .hidden — hard guarantee inside our scope. */
+#tt-palette.hidden {
+  display: none;
+}
+
+/* --------------------------------------------------------------------------
+   Panel
+   -------------------------------------------------------------------------- */
+.palette-panel {
+  width: min(560px, 92vw);
+  background: var(--bg2);
+  border: 1px solid var(--line2);
+  border-radius: 16px;
+  box-shadow: var(--shadow);
+  overflow: hidden;
+  animation: pop .18s var(--ease) both;
+}
+
+/* --------------------------------------------------------------------------
+   Input — the query field. Borderless, separated from results by a hairline.
+   -------------------------------------------------------------------------- */
+#tt-palette-input {
+  width: 100%;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid var(--line);
+  padding: 16px 18px;
+  font-family: var(--font-b);
+  font-size: 15px;
+  color: var(--text);
+  caret-color: var(--acc);
+  outline: none;
+}
+
+#tt-palette-input::placeholder {
+  color: var(--faint);
+}
+
+/* --------------------------------------------------------------------------
+   Results list — scrolls independently so the panel never outgrows the view.
+   -------------------------------------------------------------------------- */
+#tt-palette-list {
+  max-height: 44vh;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+#tt-palette-list::-webkit-scrollbar {
+  width: 8px;
+}
+
+#tt-palette-list::-webkit-scrollbar-thumb {
+  background: var(--panel2);
+  border-radius: 8px;
+}
+
+/* --------------------------------------------------------------------------
+   Rows — one command per row: icon + title (JS emits .palette-row[.sel]
+   buttons with an <i data-lucide> icon and a .palette-row-title span).
+   -------------------------------------------------------------------------- */
+.palette-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 11px 16px;
+  cursor: pointer;
+  font-size: 13.5px;
+  text-align: left;
+  color: var(--text);
+  user-select: none;
+  transition: background .12s ease, box-shadow .12s ease;
+}
+
+.palette-row:hover:not(.sel) {
+  background: var(--panel);
+}
+
+.palette-row svg {
+  width: 16px;
+  height: 16px;
+  flex: none;
+  color: var(--muted);
+  transition: color .12s ease;
+}
+
+.palette-row-title {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Selected row (keyboard cursor / active item) — accent wash + left rail. */
+.palette-row.sel {
+  background: color-mix(in srgb, var(--acc) 10%, transparent);
+  box-shadow: inset 2px 0 var(--acc);
+}
+
+.palette-row.sel svg {
+  color: var(--acc);
+}
+
+/* --------------------------------------------------------------------------
+   Empty state — no commands match the query (JS emits .palette-empty).
+   -------------------------------------------------------------------------- */
+.palette-empty {
+  padding: 22px;
+  text-align: center;
+  color: var(--faint);
+  font-family: var(--font-m);
+  font-size: 12px;
+}
+
+/* --------------------------------------------------------------------------
+   Footer — key hints (↑↓ navigate · ↵ run · esc close), JS emits .palette-foot.
+   -------------------------------------------------------------------------- */
+.palette-foot {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  border-top: 1px solid var(--line);
+  padding: 8px 16px;
+  font-family: var(--font-m);
+  font-size: 10px;
+  color: var(--faint);
+}

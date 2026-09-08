@@ -1,0 +1,285 @@
+/* ============================================================
+   planner.css — #tt-planner · study-gap planner card
+   Scope: gap chips (+ .is-booked timed-task overlay), #tt-autoplan
+   trigger, planned blocks, hint. Also parks .nx-task (misc this
+   wave — rendered by ui/next.js inside #tt-next-body).
+   Day selector reuses .day-chips from cards.css — NOT redefined.
+   No media queries here (responsive.css owns all of them).
+   Var fallbacks mirror tokens.css so the card survives alone.
+   ============================================================ */
+
+/* ---------- gap rows + clickable suggestion chips ---------- */
+
+/* day summary line JS emits above the chips ("SAT · 1 gap · 10h 30m free") */
+#tt-planner .plan-eyebrow {
+  margin: 0 0 8px;
+  font-family: var(--mono, 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace);
+  font-size: 10px;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  font-variant-numeric: tabular-nums;
+  color: var(--faint, #5c6472);
+}
+
+#tt-planner .gap-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 2px 0 10px;
+}
+
+#tt-planner .gap-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  font-family: var(--mono, 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace);
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: .02em;
+  color: var(--muted, #8b93a3);
+  background: transparent;
+  border: 1.5px dashed var(--line2, rgba(255, 255, 255, .14));
+  border-radius: 10px;
+  cursor: pointer;
+  transition:
+    border-color .25s var(--ease, cubic-bezier(.22, 1, .36, 1)),
+    color .25s var(--ease, cubic-bezier(.22, 1, .36, 1)),
+    background .25s var(--ease, cubic-bezier(.22, 1, .36, 1)),
+    transform .25s var(--ease, cubic-bezier(.22, 1, .36, 1));
+}
+
+#tt-planner .gap-chip:hover,
+#tt-planner .gap-chip:focus-visible {
+  border-color: var(--acc, #c8ff00);
+  color: var(--acc, #c8ff00);
+  background: color-mix(in srgb, var(--acc, #c8ff00) 8%, transparent);
+  transform: translateY(-2px);
+}
+
+/* duration badge inside a chip, e.g. '+45m' */
+#tt-planner .gap-chip b {
+  margin-left: 2px;
+  font-weight: 700;
+  color: var(--acc, #c8ff00);
+}
+
+/* booked gap: a timed task sits fully inside it (JS overlay — core gapsFor
+   stays class-only). Dashed → solid acc2 border + acc2 tint, no '+Nm' suffix,
+   click only toasts 'already booked: <title>' (never accepts). */
+#tt-planner .gap-chip.is-booked {
+  border-style: solid;
+  border-color: color-mix(in srgb, var(--acc2, #8b5cf6) 55%, transparent);
+  background: color-mix(in srgb, var(--acc2, #8b5cf6) 10%, transparent);
+  color: var(--acc2, #8b5cf6);
+}
+
+#tt-planner .gap-chip.is-booked:hover,
+#tt-planner .gap-chip.is-booked:focus-visible {
+  border-color: var(--acc2, #8b5cf6);
+  color: var(--acc2, #8b5cf6);
+  background: color-mix(in srgb, var(--acc2, #8b5cf6) 16%, transparent);
+  transform: none; /* not an add action — no lift */
+}
+
+/* ---------- #tt-autoplan — small .btn-acc with wand icon ---------- */
+/* Colors/depth come from base.css .btn-acc; this is only sizing. */
+
+#tt-planner #tt-autoplan {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 10px;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.4;
+  border-radius: var(--r-sm, 8px);
+}
+
+#tt-planner #tt-autoplan svg {
+  width: 13px;
+  height: 13px;
+}
+
+/* ---------- planned study blocks ---------- */
+
+#tt-planner .plan-block {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  border-radius: var(--r-md, 12px);
+  background: color-mix(in srgb, var(--acc, #c8ff00) 7%, transparent);
+  border: 1px solid color-mix(in srgb, var(--acc, #c8ff00) 22%, transparent);
+  transition:
+    opacity .3s var(--ease, cubic-bezier(.22, 1, .36, 1)),
+    border-color .25s var(--ease, cubic-bezier(.22, 1, .36, 1)),
+    transform .25s var(--ease, cubic-bezier(.22, 1, .36, 1));
+}
+
+/* stacks cleanly whether or not JS wraps blocks in a container */
+#tt-planner .plan-block + .plan-block {
+  margin-top: 8px;
+}
+
+#tt-planner .plan-block:hover {
+  border-color: color-mix(in srgb, var(--acc, #c8ff00) 38%, transparent);
+  transform: translateY(-1px);
+}
+
+/* mono start-time, accent tinted */
+#tt-planner .plan-block .plan-time,
+#tt-planner .plan-block > time {
+  flex: none;
+  font-family: var(--mono, 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace);
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: .02em;
+  color: var(--acc, #c8ff00);
+}
+
+/* title shrinks to content so the strike line matches text width */
+#tt-planner .plan-block .plan-title {
+  flex: 0 1 auto;
+  min-width: 0;
+  margin-right: auto;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text, #e8ebf1);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  background-image: linear-gradient(currentColor, currentColor);
+  background-repeat: no-repeat;
+  background-position: 0 56%;
+  background-size: 0% 1.5px;
+  transition: background-size .35s var(--ease, cubic-bezier(.22, 1, .36, 1));
+}
+
+/* done state: dimmed block + animated strike-through on the title */
+#tt-planner .plan-block.is-done {
+  opacity: .5;
+}
+
+#tt-planner .plan-block.is-done .plan-title {
+  background-size: 100% 1.5px;
+}
+
+/* mini 20px check button (small sibling of tasks.css .task-check) */
+#tt-planner .plan-check {
+  flex: none;
+  width: 20px;
+  height: 20px;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border-radius: 50%;
+  border: 1.5px solid color-mix(in srgb, var(--acc, #c8ff00) 45%, transparent);
+  background: transparent;
+  cursor: pointer;
+  transition:
+    background .2s var(--ease, cubic-bezier(.22, 1, .36, 1)),
+    border-color .2s var(--ease, cubic-bezier(.22, 1, .36, 1)),
+    transform .2s var(--ease, cubic-bezier(.22, 1, .36, 1));
+}
+
+#tt-planner .plan-check::after {
+  content: '';
+  width: 8px;
+  height: 4px;
+  border-left: 2px solid var(--bg, #0b0d12);
+  border-bottom: 2px solid var(--bg, #0b0d12);
+  transform: rotate(-45deg) scale(0);
+  transition: transform .2s var(--ease, cubic-bezier(.22, 1, .36, 1));
+}
+
+#tt-planner .plan-check:hover {
+  border-color: var(--acc, #c8ff00);
+  background: color-mix(in srgb, var(--acc, #c8ff00) 15%, transparent);
+  transform: scale(1.08);
+}
+
+#tt-planner .plan-block.is-done .plan-check {
+  background: var(--acc, #c8ff00);
+  border-color: var(--acc, #c8ff00);
+}
+
+#tt-planner .plan-block.is-done .plan-check::after {
+  transform: rotate(-45deg) scale(1);
+}
+
+/* ghost delete × (JS emits .plan-x) */
+#tt-planner .plan-x {
+  flex: none;
+  width: 20px;
+  height: 20px;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--faint, #5c6472);
+  font-size: 15px;
+  line-height: 1;
+  cursor: pointer;
+  opacity: .55;
+  transition:
+    color .2s var(--ease, cubic-bezier(.22, 1, .36, 1)),
+    opacity .2s var(--ease, cubic-bezier(.22, 1, .36, 1)),
+    transform .2s var(--ease, cubic-bezier(.22, 1, .36, 1));
+}
+
+#tt-planner .plan-x svg {
+  width: 12px;
+  height: 12px;
+}
+
+#tt-planner .plan-block:hover .plan-x {
+  opacity: 1;
+}
+
+#tt-planner .plan-x:hover {
+  color: var(--live, #ff4d8d);
+  transform: scale(1.15);
+}
+
+/* ---------- footer hint pinned to card bottom ---------- */
+
+#tt-planner .plan-hint {
+  margin-top: auto;
+  padding-top: 10px;
+  font-family: var(--mono, 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace);
+  font-size: 10px;
+  letter-spacing: .04em;
+  color: var(--faint, #5c6472);
+}
+
+/* ---------- keyboard focus ---------- */
+
+#tt-planner .plan-check:focus-visible,
+#tt-planner .plan-x:focus-visible,
+#tt-planner #tt-autoplan:focus-visible {
+  outline: 1.5px solid color-mix(in srgb, var(--acc, #c8ff00) 65%, transparent);
+  outline-offset: 2px;
+}
+
+/* ---------- misc this wave: .nx-task on the #tt-next card ----------
+   NOT planner markup — ui/next.js renders this secondary line inside
+   #tt-next-body when no class is left today but a timed task is still
+   due ('task at 14:30 · <title>'). Parked here because planner.css
+   owns misc this wave; mono 11px acc2 per spec. */
+
+#tt-next .nx-task {
+  display: block;
+  max-width: 100%;
+  margin: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  font-family: var(--mono, 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace);
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: .02em;
+  color: var(--acc2, #8b5cf6);
+}

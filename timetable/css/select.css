@@ -1,0 +1,202 @@
+/* ============================================================
+   select.css — custom dropdown (.ttsel) for enhanced native selects
+   Enhanced in place by js/ui/select.js: #tt-task-cat, #tt-focus-task.
+   The native <select> stays in the DOM as the source of truth for
+   value/options/form submit — visually hidden via .ttsel-src
+   (sr-only pattern, NEVER display:none, so its value still submits
+   with forms and stays scriptable). select.js also sets tabindex=-1
+   + aria-hidden on it: the replacement button carries the full
+   listbox ARIA, so the hidden select must not be a tab stop.
+   Tokens from tokens.css; pop keyframe from motion.css (reduced-motion
+   is already killed globally there).
+   ============================================================ */
+
+/* ---------- visually-hidden source select (sr-only pattern) ---------- */
+/* !important throughout: ID rules in tasks.css/focus.css/responsive.css
+   (#tt-task-cat, #tt-focus-task) would otherwise win on specificity */
+.ttsel-src {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0 0 0 0) !important;
+  clip-path: inset(50%) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}
+
+/* ---------- wrapper (positioning context for the list) ---------- */
+.ttsel {
+  position: relative;
+  display: inline-block;
+  flex-shrink: 0;
+}
+
+/* focus-card instance: sizes to its content (up to the card width) and
+   stays centered, so long labels/placeholders ellipsize only as a last
+   resort (was #tt-focus-task { width:100%; max-width:180px; margin:0 auto }) */
+.ttsel[data-ttsel="tt-focus-task"] {
+  display: block;
+  width: fit-content;
+  max-width: 100%;
+  margin: 0 auto;
+}
+
+/* ---------- trigger button (glass, matches .bento inputs) ---------- */
+.ttsel-btn {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  width: 100%;
+  background: var(--panel2);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 10px 12px;
+  font-family: var(--font-m, 'JetBrains Mono', ui-monospace, monospace);
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  line-height: 1.4;
+  color: var(--text);
+  cursor: pointer;
+  outline: none;
+  touch-action: manipulation;
+  transition:
+    border-color 0.2s var(--ease),
+    box-shadow 0.2s var(--ease),
+    background-color 0.2s var(--ease);
+}
+
+.ttsel-btn:hover {
+  border-color: var(--line2);
+}
+
+/* mirrors #tt-focus-task:disabled in focus.css */
+.ttsel-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.ttsel-btn:focus-visible,
+.ttsel.open .ttsel-btn {
+  border-color: color-mix(in srgb, var(--acc) 55%, transparent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--acc) 16%, transparent);
+}
+
+.ttsel-label {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ttsel-btn svg {
+  width: 13px;
+  height: 13px;
+  flex-shrink: 0;
+  color: var(--faint);
+  transition: transform 0.2s var(--ease);
+}
+
+.ttsel.open .ttsel-btn svg {
+  transform: rotate(180deg);
+}
+
+/* ---------- dropdown list ---------- */
+.ttsel-list {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  z-index: 90;
+  min-width: 100%;
+  max-width: 260px;
+  max-height: 260px; /* same dropdown on mobile — scrolls, no native picker */
+  margin: 0;
+  padding: 5px;
+  list-style: none;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  background: var(--bg2);
+  border: 1px solid var(--line2);
+  border-radius: 12px;
+  box-shadow: var(--shadow);
+  transform-origin: top center;
+  animation: pop 0.15s var(--ease);
+  scrollbar-width: thin;
+  scrollbar-color: var(--line2) transparent;
+}
+
+.ttsel-list[hidden] {
+  display: none;
+}
+
+/* ---------- option ---------- */
+.ttsel-opt {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  border-radius: 8px;
+  font-family: var(--font-b, 'Inter', system-ui, sans-serif);
+  font-size: 13px;
+  line-height: 1.35;
+  color: var(--muted);
+  cursor: pointer;
+  user-select: none;
+  -webkit-user-select: none;
+  transition: background-color 0.12s var(--ease), color 0.12s var(--ease);
+}
+
+.ttsel-opt-text {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* hover / keyboard-active / selected: accent wash + inset left bar */
+.ttsel-opt:hover,
+.ttsel-opt.active,
+.ttsel-opt.sel {
+  background: color-mix(in srgb, var(--acc) 12%, transparent);
+  box-shadow: inset 2px 0 0 var(--acc);
+  color: var(--text);
+}
+
+/* selected check (rendered on every option, shown only on .sel) */
+.ttsel-check {
+  display: none;
+  flex-shrink: 0;
+  color: var(--acc);
+}
+
+.ttsel-opt.sel .ttsel-check {
+  display: inline-flex;
+}
+
+.ttsel-check svg {
+  width: 13px;
+  height: 13px;
+}
+
+/* disabled option (e.g. the "pick a task…" placeholder) */
+.ttsel-opt.dis,
+.ttsel-opt.dis:hover {
+  background: transparent;
+  box-shadow: none;
+  color: var(--faint);
+  cursor: default;
+}
+
+/* a disabled option is never a real pick — no ✓ even when it's the
+   current value (placed after the .sel rule so it wins on .dis.sel) */
+.ttsel-opt.dis .ttsel-check,
+.ttsel-opt[aria-disabled] .ttsel-check {
+  display: none;
+}
+
+/* ---------- ≤760px rules (task-cat full row, ≥40px tap targets on
+   .ttsel-btn/.ttsel-opt) live in responsive.css — media queries contract. */

@@ -1,0 +1,539 @@
+/* ============================================================
+   focus.css — #tt-focus pomodoro card + topbar mini-timer
+   Scope: duration picker (preset/custom/break chips), SVG progress
+   dial (4px track, glow only while running), split-digit time
+   readout with blinking colon, mode label ('focus 25'/'break 5'),
+   task select, controls, session dots, session-complete flash,
+   .focus-mini topbar chip.
+   Tokens (--acc/--acc2/--line/--line2/--ease) from tokens.css;
+   keyframes (pop) from motion.css. The ONE exception: 'focus-blink'
+   is sanctioned inline — js/ui/focus.js injects it via a <style>;
+   rules here only reference it by name. No media queries here —
+   reduced-motion is killed globally in motion.css; the picker is
+   fluid (wraps, max-widths) so no breakpoints are needed.
+   ============================================================ */
+
+#tt-focus .bento-body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  text-align: center;
+}
+
+/* ---------- duration setup (presets + custom + break, above the dial) ---------- */
+
+.focus-setup {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  max-width: 260px;
+  margin: 0 auto;
+  transition: opacity 0.25s var(--ease);
+}
+
+/* locked while the timer runs (JS toggles .is-locked) —
+   presets disable: opacity .4 + pointer-events none */
+.focus-setup.is-locked {
+  opacity: 0.4;
+  pointer-events: none;
+}
+
+.focus-presets,
+.focus-breaks {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  max-width: 100%;
+}
+
+.focus-chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 30px;
+  padding: 5px 10px;
+  font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 10px;
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: 0.05em;
+  color: var(--muted, #8a90a3);
+  background: var(--glass, rgba(255, 255, 255, 0.045));
+  border: 1px solid var(--line, rgba(255, 255, 255, 0.09));
+  border-radius: 999px;
+  outline: none;
+  cursor: pointer;
+  user-select: none;
+  -webkit-user-select: none;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  transition:
+    color 0.2s var(--ease),
+    border-color 0.2s var(--ease),
+    background-color 0.2s var(--ease),
+    box-shadow 0.2s var(--ease);
+}
+
+.focus-chip:hover {
+  color: var(--text, #f2f5fa);
+  border-color: var(--line2, rgba(255, 255, 255, 0.16));
+}
+
+.focus-chip:focus-visible {
+  border-color: color-mix(in srgb, var(--acc) 55%, transparent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--acc) 14%, transparent);
+}
+
+/* active focus duration — accent pill */
+.focus-chip.on {
+  color: var(--acc);
+  border-color: color-mix(in srgb, var(--acc) 55%, transparent);
+  background: color-mix(in srgb, var(--acc) 10%, transparent);
+  box-shadow: 0 0 10px color-mix(in srgb, var(--acc) 18%, transparent);
+}
+
+/* active break length — violet, matching the break dial */
+.focus-chip-brk.on,
+.focus-chip-brk.on:focus-visible {
+  color: var(--acc2, #8b5cf6);
+  border-color: color-mix(in srgb, var(--acc2, #8b5cf6) 55%, transparent);
+  background: color-mix(in srgb, var(--acc2, #8b5cf6) 12%, transparent);
+  box-shadow: 0 0 10px color-mix(in srgb, var(--acc2, #8b5cf6) 20%, transparent);
+}
+
+.focus-brk-label {
+  margin-right: 2px;
+  font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  text-indent: 0.22em; /* optically re-centers tracked caps */
+  text-transform: uppercase;
+  color: var(--faint, #5b6172);
+}
+
+/* custom minutes — hidden until the custom chip opens it
+   (JS toggles .is-custom on .focus-presets) */
+.focus-custom {
+  display: none;
+  align-items: center;
+  gap: 6px;
+}
+
+.focus-presets.is-custom .focus-custom {
+  display: inline-flex;
+}
+
+.focus-custom-in {
+  width: 64px;
+  padding: 6px 4px;
+  font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1;
+  text-align: center;
+  color: var(--text, #f2f5fa);
+  background: var(--glass, rgba(255, 255, 255, 0.045));
+  border: 1px solid var(--line, rgba(255, 255, 255, 0.09));
+  border-radius: 10px;
+  outline: none;
+  appearance: textfield; /* hide native spinners */
+  -moz-appearance: textfield;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  transition:
+    border-color 0.2s var(--ease),
+    box-shadow 0.2s var(--ease);
+}
+
+.focus-custom-in::-webkit-outer-spin-button,
+.focus-custom-in::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.focus-custom-in:hover {
+  border-color: var(--line2, rgba(255, 255, 255, 0.16));
+}
+
+.focus-custom-in:focus,
+.focus-custom-in:focus-visible {
+  border-color: color-mix(in srgb, var(--acc) 55%, transparent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--acc) 14%, transparent);
+}
+
+.focus-custom-in:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* compact apply button next to the custom input (shrinks the 38px .icon-btn) */
+.focus-custom-go {
+  width: 26px;
+  height: 26px;
+  min-width: 26px;
+  padding: 0;
+  border-radius: 8px;
+}
+
+.focus-custom-go svg {
+  width: 13px;
+  height: 13px;
+}
+
+/* ---------- dial ---------- */
+
+.focus-dial-wrap {
+  position: relative;
+  width: 148px;
+  height: 148px;
+  margin: 0 auto;
+  flex: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.focus-dial-wrap svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  transform: rotate(-90deg); /* ring starts at 12 o'clock */
+  overflow: visible; /* let the drop-shadow glow breathe */
+}
+
+.focus-dial-wrap circle {
+  fill: none;
+  stroke-width: 6;
+}
+
+/* track: any circle that isn't the progress arc — v5 slims it to 4px
+   (the 6px progress arc stays the loudest ring element) */
+.focus-track,
+.focus-dial-wrap circle:not(.focus-prog) {
+  stroke: var(--line2, rgba(255, 255, 255, 0.16));
+  stroke-width: 4;
+}
+
+.focus-prog {
+  stroke: var(--acc);
+  stroke-linecap: round;
+  transition:
+    stroke-dashoffset 0.95s linear,
+    stroke 0.3s var(--ease),
+    filter 0.3s var(--ease),
+    opacity 0.25s var(--ease);
+}
+
+/* glow only while the timer is actually running (JS toggles
+   .is-running on #tt-focus-dial or the wrap) */
+#tt-focus-dial.is-running .focus-prog,
+.focus-dial-wrap.is-running .focus-prog {
+  filter: drop-shadow(0 0 12px color-mix(in srgb, var(--acc) 45%, transparent));
+}
+
+/* break mode — accent flips to violet (JS toggles class/attr on wrap/dial) */
+.focus-dial-wrap.is-break .focus-prog,
+#tt-focus-dial.is-break .focus-prog,
+.focus-dial-wrap[data-mode="break"] .focus-prog {
+  stroke: var(--acc2, #8b5cf6);
+}
+
+.focus-dial-wrap.is-break.is-running .focus-prog,
+#tt-focus-dial.is-break.is-running .focus-prog,
+.focus-dial-wrap[data-mode="break"].is-running .focus-prog {
+  filter: drop-shadow(0 0 12px color-mix(in srgb, var(--acc2, #8b5cf6) 45%, transparent));
+}
+
+/* ---------- time + mode readout ---------- */
+
+.focus-time {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: row; /* mm : ss — split spans so the colon can blink alone */
+  align-items: center;
+  justify-content: center;
+  font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 34px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1;
+  letter-spacing: -0.01em;
+  line-height: 1;
+  color: var(--text, #f2f5fa);
+  text-shadow: 0 0 22px color-mix(in srgb, var(--acc) 16%, transparent);
+  pointer-events: none;
+}
+
+/* blinking colon — only while running. References 'focus-blink', the
+   sanctioned inline keyframes injected by js/ui/focus.js (motion.css
+   still kills it under prefers-reduced-motion) */
+.focus-dial-wrap.is-running .focus-colon {
+  animation: focus-blink 1s steps(2, start) infinite;
+}
+
+/* eyebrow under the digits — pinned just below the
+   time readout inside the dial wrap (JS emits it as a sibling of
+   .focus-time inside .focus-dial-wrap). v5: shows the chosen length —
+   'focus 25' / 'break 5', lowercase per the copy voice */
+.focus-mode {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.24em;
+  text-indent: 0.24em; /* optically re-centers tracked text */
+  color: var(--acc);
+  transition: color 0.3s var(--ease);
+}
+
+.focus-dial-wrap .focus-mode {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  transform: translateY(14px);
+  text-align: center;
+  pointer-events: none;
+}
+
+.focus-dial-wrap.is-break .focus-mode,
+#tt-focus-dial.is-break .focus-mode,
+.focus-dial-wrap[data-mode="break"] .focus-mode,
+.focus-mode.is-break,
+.focus-mode.break {
+  color: var(--acc2, #8b5cf6);
+}
+
+/* ---------- task select (glass, matches tasks input) ---------- */
+
+#tt-focus-task {
+  display: block;
+  width: 100%;
+  max-width: 180px;
+  margin: 0 auto;
+  padding: 7px 26px 7px 10px;
+  font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 11px;
+  color: var(--text, #f2f5fa);
+  background: var(--glass, rgba(255, 255, 255, 0.045));
+  border: 1px solid var(--line, rgba(255, 255, 255, 0.09));
+  border-radius: 10px;
+  outline: none;
+  appearance: none;
+  -webkit-appearance: none;
+  cursor: pointer;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  /* custom chevron (appearance:none drops the native one) */
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6' fill='none'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%238a90a3' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 9px center;
+  transition:
+    border-color 0.2s var(--ease),
+    box-shadow 0.2s var(--ease),
+    background-color 0.2s var(--ease);
+}
+
+#tt-focus-task:hover {
+  border-color: var(--line2, rgba(255, 255, 255, 0.16));
+}
+
+#tt-focus-task:focus,
+#tt-focus-task:focus-visible {
+  border-color: color-mix(in srgb, var(--acc) 55%, transparent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--acc) 14%, transparent);
+}
+
+#tt-focus-task option {
+  background: #14161d;
+  color: #e9edf4;
+}
+
+#tt-focus-task:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ---------- controls ---------- */
+
+.focus-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.focus-controls .btn-acc,
+.focus-controls .btn-ghost {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+}
+
+/* start/resume — the one accent pill. Self-sufficient (JS button may
+   lack the .btn base): sizing + anti-jitter min-width live here.
+   (.focus-toggle = class the JS currently emits; .focus-start = canonical) */
+.focus-start,
+.focus-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 22px;
+  border-radius: 999px;
+  font-weight: 600;
+  font-size: 13px;
+  line-height: 1;
+  letter-spacing: .01em;
+  white-space: nowrap;
+  min-width: 116px; /* no width jitter across Start/Pause/Resume labels */
+  cursor: pointer;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/* pause = .btn-ghost (base), reset = .icon-btn (base) — just the spin */
+.focus-reset svg {
+  transition: transform 0.45s var(--ease);
+}
+
+.focus-reset:hover svg {
+  transform: rotate(-180deg);
+}
+
+.focus-controls button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+/* ---------- session dots ---------- */
+
+.focus-dots {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin-top: 10px;
+  min-height: 8px;
+}
+
+.focus-dot,
+.focus-dots > span,
+.focus-dots > i {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--line2, rgba(255, 255, 255, 0.14));
+  transition:
+    background 0.3s var(--ease),
+    box-shadow 0.3s var(--ease),
+    transform 0.3s var(--ease);
+}
+
+/* JS emits .focus-dot.on for completed sessions (.done kept for parity) */
+.focus-dot.on,
+.focus-dot.done,
+.focus-dots > .done {
+  background: var(--acc);
+  box-shadow: 0 0 8px color-mix(in srgb, var(--acc) 60%, transparent);
+  transform: scale(1.05);
+}
+
+/* ---------- session-complete flash (JS adds .focus-flash) ---------- */
+
+.focus-flash {
+  animation: pop 0.5s var(--ease);
+}
+
+/* ---------- topbar mini-timer (JS inserts .focus-mini as the FIRST child
+   of .topbar-actions; inline-flex sits fine inside the flex topbar — no
+   absolute positioning needed) ---------- */
+
+.focus-mini {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 10px;
+  font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 12px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1;
+  line-height: 1;
+  letter-spacing: 0.02em;
+  color: var(--text, #f2f5fa);
+  background: var(--glass, rgba(255, 255, 255, 0.045));
+  border: 1px solid var(--line, rgba(255, 255, 255, 0.09));
+  border-radius: 999px;
+  outline: none;
+  cursor: pointer;
+  white-space: nowrap;
+  user-select: none;
+  -webkit-user-select: none;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  transition:
+    opacity 0.25s var(--ease),
+    color 0.2s var(--ease),
+    border-color 0.2s var(--ease),
+    box-shadow 0.2s var(--ease);
+}
+
+.focus-mini:hover {
+  color: var(--acc);
+  border-color: var(--line2, rgba(255, 255, 255, 0.16));
+}
+
+.focus-mini:focus-visible {
+  border-color: color-mix(in srgb, var(--acc) 55%, transparent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--acc) 14%, transparent);
+}
+
+/* 6px accent dot — pulses via the sanctioned 'focus-blink' keyframes
+   (injected inline by focus.js) only while actually running; a paused
+   chip shows it static */
+.focus-mini-dot {
+  width: 6px;
+  height: 6px;
+  flex: none;
+  border-radius: 50%;
+  background: var(--acc);
+  box-shadow: 0 0 6px color-mix(in srgb, var(--acc) 60%, transparent);
+}
+
+.focus-mini:not(.is-paused) .focus-mini-dot {
+  animation: focus-blink 1.6s steps(2, start) infinite;
+}
+
+/* break sessions flip the dot violet, matching the break dial */
+.focus-mini.is-break .focus-mini-dot {
+  background: var(--acc2, #8b5cf6);
+  box-shadow: 0 0 6px color-mix(in srgb, var(--acc2, #8b5cf6) 60%, transparent);
+}
+
+/* paused — chip stays but dims, countdown frozen, 'paused' tag shows */
+.focus-mini.is-paused {
+  opacity: 0.5;
+  border-style: dashed;
+}
+
+.focus-mini-state {
+  display: none;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  color: var(--faint, #5b6172);
+}
+
+.focus-mini.is-paused .focus-mini-state {
+  display: inline;
+}

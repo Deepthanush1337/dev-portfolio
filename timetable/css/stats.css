@@ -1,0 +1,191 @@
+/* ============================================================
+   stats.css — Stats bento: metric tiles + weekly sparklines
+   Scope: #tt-stats-body (section#tt-stats > .bento-body)
+   Two spark rows: class minutes Mon–Sun (.spark, lime --acc)
+   and focus minutes, last 7 days (.spark.spark-focus, violet
+   --acc2). Tokens (--acc/--acc2/--panel2/--line/--r-md/--glow/
+   --ease…) live in tokens.css; keyframes live in motion.css.
+   No media queries here — responsive.css owns all of them.
+   ============================================================ */
+
+/* --- Metric grid ------------------------------------------- */
+
+#tt-stats-body .stat-grid {
+  display: grid;
+  /* 7 tiles → fluid auto-fit (110px floor); responsive.css pins
+     a 2-col layout on small phones */
+  grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+  gap: 12px;
+}
+
+#tt-stats-body .stat {
+  min-width: 0;
+  padding: 14px;
+  border-radius: var(--r-md);
+  background: var(--panel2);
+  border: 1px solid var(--line);
+  transition:
+    transform 0.25s var(--ease),
+    border-color 0.25s var(--ease),
+    box-shadow 0.25s var(--ease);
+}
+
+#tt-stats-body .stat:hover {
+  transform: translateY(-2px);
+  border-color: color-mix(in srgb, var(--acc) 30%, var(--line));
+}
+
+/* Big numeric value — Space Grotesk, tabular, tight tracking.
+   `.counting` (JS count-up in progress) needs no special styling. */
+#tt-stats-body .stat-num {
+  font-family: "Space Grotesk", var(--font-sans, system-ui, sans-serif);
+  font-weight: 700;
+  font-size: 28px;
+  line-height: 1.1;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+  color: var(--text, #eef1f8);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Unit suffix, e.g. the "h" in "12h" */
+#tt-stats-body .stat-num small,
+#tt-stats-body .stat-num .stat-suffix {
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0;
+  color: var(--muted, rgba(235, 240, 255, 0.55));
+  margin-left: 2px;
+}
+
+/* Eyebrow label under the number — wraps to 2 lines instead of
+   truncating ("classes this week" doesn't fit a 3-col tile at 9px) */
+#tt-stats-body .stat-label {
+  margin-top: 6px;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted, rgba(235, 240, 255, 0.55));
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+/* --- Sparklines (per-day bars) ------------------------------ */
+
+/* Section caption above each spark row — owns the hairline that
+   separates the row from whatever sits above it (tiles / labels) */
+#tt-stats-body .spark-cap {
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid var(--line);
+  font-family: var(--font-mono, ui-monospace, "Cascadia Code", Consolas, monospace);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--faint, rgba(235, 240, 255, 0.35));
+}
+
+#tt-stats-body .spark {
+  display: flex;
+  align-items: flex-end;
+  gap: 5px;
+  height: 56px;
+  margin-top: 8px;
+  padding-top: 10px; /* headroom for the hover value chip of full-height bars */
+}
+
+#tt-stats-body .spark-bar {
+  position: relative;
+  flex: 1 1 0%;
+  min-width: 0;
+  min-height: 3px; /* zero-days still show a nub */
+  border-radius: 4px 4px 2px 2px;
+  background: linear-gradient(
+    180deg,
+    var(--acc),
+    color-mix(in srgb, var(--acc) 25%, transparent)
+  );
+  transition: height 0.6s var(--ease), filter 0.2s var(--ease);
+}
+
+#tt-stats-body .spark-bar:hover {
+  filter: brightness(1.15);
+}
+
+/* Tooltip-ish value label above the bar on hover */
+#tt-stats-body .spark-bar::after {
+  content: attr(data-v);
+  position: absolute;
+  bottom: calc(100% + 6px);
+  left: 50%;
+  z-index: 2;
+  transform: translate(-50%, 2px);
+  padding: 3px 6px;
+  border-radius: 6px;
+  border: 1px solid var(--line);
+  background: var(--panel2);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
+  font-family: var(--font-mono, ui-monospace, "Cascadia Code", Consolas, monospace);
+  font-size: 9px;
+  line-height: 1;
+  color: var(--text, #eef1f8);
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.18s var(--ease), transform 0.18s var(--ease);
+}
+
+#tt-stats-body .spark-bar:hover::after,
+#tt-stats-body .spark-bar:focus-visible::after {
+  opacity: 1;
+  transform: translate(-50%, 0);
+}
+
+/* Today's bar gets the accent glow (box-shadow > outline here,
+   so the glow hugs the rounded bar) */
+#tt-stats-body .spark-bar.today {
+  box-shadow: var(--glow);
+}
+
+/* Focus variant: violet gradient bars + a matching violet glow
+   on today's bar (--glow is lime-tinted, so mirror it with --acc2) */
+#tt-stats-body .spark-focus .spark-bar {
+  background: linear-gradient(
+    180deg,
+    var(--acc2),
+    color-mix(in srgb, var(--acc2) 25%, transparent)
+  );
+}
+
+#tt-stats-body .spark-focus .spark-bar.today {
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, var(--acc2) 30%, transparent),
+    0 10px 36px color-mix(in srgb, var(--acc2) 14%, transparent);
+}
+
+/* Zero-minute days: quiet gray nub, not an accent bar — six empty
+   days must not read as one continuous accent rule. Declared after
+   the tone variants so the gray wins for both sparks. */
+#tt-stats-body .spark-bar[style*="height:0%"] {
+  min-height: 2px;
+  background: var(--line);
+  box-shadow: none;
+}
+
+/* Day letters under the bars */
+#tt-stats-body .spark-labels {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 6px;
+  font-family: var(--font-mono, ui-monospace, "Cascadia Code", Consolas, monospace);
+  font-size: 9px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--faint, rgba(235, 240, 255, 0.35));
+}

@@ -1,0 +1,134 @@
+/* layout.css — topbar / bento-grid spans / footer
+   Scope: .topbar, .brand, .topbar-clock, .topbar-actions, .bento-grid (+ .s* / .r2), footer.
+   Tokens come from tokens.css; NO media queries here (responsive.css owns them all). */
+
+/* ---------- Topbar ---------- */
+
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: rgba(10, 10, 12, 0.78); /* pre-color-mix fallback */
+  background: color-mix(in srgb, var(--bg) 78%, transparent);
+  -webkit-backdrop-filter: blur(18px);
+  backdrop-filter: blur(18px);
+  border-bottom: 1px solid var(--line);
+}
+
+.topbar-inner {
+  max-width: 1280px;
+  margin: 0 auto;
+  min-height: var(--topbar-h, 58px);
+  padding: 10px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+/* ---------- Brand ---------- */
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  user-select: none;
+}
+
+.brand-tile {
+  width: 32px;
+  height: 32px;
+  flex: 0 0 32px;
+  border-radius: 8px;
+  background: var(--grad);
+  color: #0a0a0a;
+  font-family: var(--font-d, system-ui, sans-serif);
+  font-weight: 800;
+  font-size: 14px;
+  display: grid;
+  place-items: center;
+  box-shadow: var(--glow);
+}
+
+.brand-word {
+  font-family: var(--font-d, system-ui, sans-serif);
+  font-weight: 700;
+  font-size: 18px;
+  letter-spacing: -0.02em;
+  white-space: nowrap;
+}
+
+/* ---------- Clock ---------- */
+
+.topbar-clock {
+  text-align: right;
+  flex: 0 0 auto;
+}
+
+#tt-clock {
+  display: block;
+  font-family: var(--font-m, 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace);
+  font-weight: 700;
+  font-size: 15px;
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: 'tnum' 1;
+  line-height: 1.1;
+}
+
+#tt-date {
+  display: block;
+  margin-top: 2px;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  line-height: 1.2;
+  color: var(--muted, rgba(235, 240, 255, 0.6));
+}
+
+/* ---------- Actions ---------- */
+
+.topbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 0 0 auto;
+}
+
+/* ---------- Bento grid ---------- */
+
+.bento-grid {
+  max-width: 1280px;
+  margin: 28px auto 64px;
+  padding: 0 24px;
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  grid-auto-rows: minmax(190px, auto);
+  gap: 16px;
+}
+
+.bento-grid > * {
+  min-width: 0;
+}
+
+.s3  { grid-column: span 3; }
+.s4  { grid-column: span 4; }
+.s5  { grid-column: span 5; }
+.s7  { grid-column: span 7; }
+.s12 { grid-column: span 12; }
+.r2  { grid-row: span 2; }
+
+/* ---------- Footer ---------- */
+
+footer,
+.footer {
+  margin-top: 56px;
+  padding: 0 24px 28px;
+  text-align: center;
+  font-family: var(--font-m, 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  color: var(--faint, var(--muted, rgba(235, 240, 255, 0.38)));
+  opacity: 0.55;
+}

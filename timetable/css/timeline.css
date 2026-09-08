@@ -1,0 +1,385 @@
+/* timeline.css — today timeline rail (section#tt-today > #tt-today-body)
+   Scope: .tl-* only. Tokens from tokens.css, keyframes (pulse-dot, strike) from motion.css.
+   Row: .tl-row > .tl-time(.tl-start/.tl-end) + .tl-rail(.tl-dot) + (.tl-card | .tl-gap)
+   Class card body: .tl-main(.tl-code + .tl-name [+ .badge-live]) + .tl-meta chips
+   Task card body: .tl-check (18px mini checkbox) + .tl-task-title [+ .badge-live + .tl-count]
+   Modifiers: .is-live, .is-past, .is-gap, .tl-break, .tl-task (+ .tl-task.is-live / .tl-task.is-done)
+   Reduced motion: handled globally in motion.css (kills pulse-dot + hover transitions). */
+
+.tl-rail {
+  display: flex;
+  flex-direction: column;
+  align-items: center;     /* keep .tl-dot centered on the rail */
+  justify-content: center;
+  position: relative;
+}
+
+/* ---- row: 64px time | 16px rail | 1fr card ---- */
+.tl-row {
+  /* local aliases: resolve token font names with graceful fallbacks
+     (defined on the row so time/rail/card descendants all inherit) */
+  --_mono: var(--font-m, ui-monospace, "Cascadia Code", "SF Mono", Consolas, monospace);
+  --_disp: var(--font-d, "Space Grotesk", system-ui, sans-serif);
+  --_e: var(--ease, cubic-bezier(0.22, 0.68, 0, 1));
+  --_time-w: 64px;
+  --_rail-w: 16px;
+  display: grid;
+  /* minmax(0,1fr): the card track must shrink below the card's min-content
+     (the nowrap .tl-count chip) instead of blowing the row out of the card */
+  grid-template-columns: var(--_time-w) var(--_rail-w) minmax(0, 1fr);
+  padding: 10px 0;
+  position: relative;
+  transition: opacity 0.3s var(--_e);
+}
+
+/* center rail: 2px vertical line, full row height, capped at first/last row */
+.tl-row::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: calc(var(--_time-w) + (var(--_rail-w) / 2) - 1px); /* center of the rail column */
+  width: 2px;
+  border-radius: 2px;
+  background: var(--line, rgba(255, 255, 255, 0.08));
+}
+.tl-row:first-child::before { top: 50%; }
+.tl-row:last-child::before { bottom: 50%; }
+
+/* 8px dot on the rail (flex-centered by .tl-rail, sits over the line) */
+.tl-dot {
+  position: relative;
+  z-index: 1;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--faint, #646a80);
+  transition: background 0.2s var(--_e), box-shadow 0.2s var(--_e);
+}
+
+/* ---- left time cell ---- */
+.tl-time {
+  grid-column: 1;
+  grid-row: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding-top: 11px; /* optically align with the card's first line */
+  font-family: var(--_mono);
+  font-size: 12px;
+  line-height: 1.2;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+.tl-start,
+.tl-time > :first-child {
+  font-weight: 500;
+  color: color-mix(in srgb, var(--acc, #c8ff00) 82%, var(--text, #eceef5));
+}
+.tl-end,
+.tl-time > :last-child {
+  font-size: 10px;
+  color: var(--faint, #646a80);
+}
+
+/* ---- class card ---- */
+.tl-card {
+  grid-column: 3;
+  grid-row: 1;
+  min-width: 0; /* shrink inside the minmax(0,1fr) track — the flex:none
+                   .tl-count chip would otherwise push the card wide */
+  margin-left: 12px;
+  padding: 10px 12px;
+  border: 1px solid var(--line, rgba(255, 255, 255, 0.08));
+  border-radius: var(--r-md, 12px);
+  background: var(--panel, rgba(255, 255, 255, 0.04));
+  transition: transform 0.18s var(--_e), border-color 0.18s var(--_e), background 0.18s var(--_e);
+}
+.tl-card:hover {
+  transform: translateX(3px);
+  border-color: var(--line2, rgba(255, 255, 255, 0.16));
+}
+
+/* code stacked over the (ellipsized) course name — wrapper emitted by
+   today.js buildClassRow; the optional .badge-live drops to its own line below */
+.tl-main {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1px;
+  min-width: 0;
+}
+.tl-main .badge-live {
+  margin-top: 4px;
+}
+
+.tl-code {
+  font-family: var(--_disp);
+  font-weight: 700;
+  font-size: 14px;
+  line-height: 1.25;
+  letter-spacing: 0.02em;
+  color: var(--text, #eceef5);
+}
+.tl-name {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 12px;
+  line-height: 1.35;
+  color: var(--muted, #9aa0b4);
+}
+.tl-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 7px;
+}
+.tl-meta > * {
+  font-family: var(--_mono);
+  font-size: 10px;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+  color: var(--faint, #646a80);
+  border: 1px solid var(--line, rgba(255, 255, 255, 0.08));
+  border-radius: 999px;
+  padding: 2px 7px;
+}
+
+/* live countdown chip — first item in the live row's .tl-meta */
+.tl-count {
+  color: var(--live, #ff4d8d);
+  border-color: color-mix(in srgb, var(--live, #ff4d8d) 35%, transparent);
+  background: color-mix(in srgb, var(--live, #ff4d8d) 8%, transparent);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---- states ---- */
+
+/* past rows fade out */
+.tl-row.is-past {
+  opacity: 0.45;
+}
+
+/* live row: course-tinted card + pulsing live dot */
+.tl-row.is-live .tl-card {
+  border-color: color-mix(in srgb, var(--c, var(--acc2, #8b5cf6)) 50%, transparent);
+  background: color-mix(in srgb, var(--c, var(--acc2, #8b5cf6)) 8%, transparent);
+}
+.tl-row.is-live .tl-dot {
+  width: 10px;
+  height: 10px;
+  background: var(--live, #ff4d8d);
+  box-shadow: 0 0 12px color-mix(in srgb, var(--live, #ff4d8d) 55%, transparent);
+  animation: pulse-dot 1.8s var(--_e) infinite;
+}
+
+/* gap rows: JS emits a bare .tl-gap cell — style it as the dashed ghost card */
+.tl-gap {
+  grid-column: 3;
+  grid-row: 1;
+  margin-left: 12px;
+  padding: 10px 12px;
+  display: flex;
+  align-items: center;
+  border: 1px dashed var(--line, rgba(255, 255, 255, 0.08));
+  border-radius: var(--r-md, 12px);
+  background: transparent;
+  font-family: var(--_mono);
+  font-style: italic;
+  font-size: 11px;
+  color: var(--faint, #646a80);
+  font-variant-numeric: tabular-nums;
+  transition: transform 0.18s var(--_e), border-color 0.18s var(--_e);
+}
+.tl-gap:hover {
+  transform: translateX(3px);
+  border-color: var(--line2, rgba(255, 255, 255, 0.16));
+}
+
+/* (kept for any gap row that does carry a .tl-card) */
+.tl-row.is-gap .tl-card {
+  border-style: dashed;
+  background: transparent;
+  display: flex;
+  align-items: center;
+  font-family: var(--_mono);
+  font-style: italic;
+  font-size: 11px;
+  color: var(--faint, #646a80);
+}
+.tl-row.is-gap .tl-code,
+.tl-row.is-gap .tl-name {
+  font-family: inherit;
+  font-style: italic;
+  font-weight: 400;
+  font-size: 11px;
+  color: var(--faint, #646a80);
+}
+
+/* ---- break rows (.tl-row.tl-break): square rail dot + dashed ghost card ---- */
+.tl-row.tl-break .tl-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 2px; /* small square instead of the round class dot */
+}
+.tl-row.tl-break .tl-card {
+  display: flex;
+  align-items: center;
+  border-style: dashed;
+  background: transparent;
+}
+.tl-row.tl-break .tl-card:hover {
+  border-color: var(--line2, rgba(255, 255, 255, 0.16));
+}
+.tl-break-label {
+  font-family: var(--_mono);
+  font-weight: 500;
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--faint, #646a80);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---- timed task rows (.tl-row.tl-task): hollow square marker + mini check ---- */
+
+/* 8px hollow square on the rail (2px acc2 ring, keeps the 8px dot footprint) */
+.tl-row.tl-task .tl-dot {
+  width: 8px;
+  height: 8px;
+  box-sizing: border-box;
+  border-radius: 1px;
+  background: transparent;
+  border: 2px solid var(--acc2, #8b5cf6);
+}
+.tl-row.tl-task.is-done .tl-dot {
+  background: color-mix(in srgb, var(--acc2, #8b5cf6) 30%, transparent);
+}
+
+/* live timed task: hollow square stays hollow but turns pink + pulses
+   (beats the generic .tl-row.is-live .tl-dot fill on specificity: 0-4-0) */
+.tl-row.tl-task.is-live .tl-dot {
+  border-color: var(--live, #ff4d8d);
+  animation: pulse-dot 1.8s var(--_e) infinite;
+}
+
+/* card = checkbox + title on one line; hover lifts the accent tint */
+.tl-row.tl-task .tl-card {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.tl-row.tl-task .tl-card:hover {
+  border-color: color-mix(in srgb, var(--acc2, #8b5cf6) 40%, transparent);
+}
+
+/* 18px mini checkbox — small sibling of tasks.css .task-check (same draw-in) */
+.tl-check {
+  flex: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 6px;
+  border: 1.5px solid var(--line2, rgba(255, 255, 255, 0.16));
+  background: transparent;
+  padding: 0;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  transition: background-color 0.25s var(--_e), border-color 0.25s var(--_e),
+    transform 0.15s var(--_e);
+}
+.tl-check svg {
+  width: 11px;
+  height: 11px;
+  display: block;
+}
+.tl-check svg path {
+  stroke: var(--bg, #07070b);
+  stroke-width: 3;
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 24;
+  stroke-dashoffset: 24;
+  transition: stroke-dashoffset 0.3s var(--_e);
+}
+.tl-row.tl-task:not(.is-done) .tl-check:hover {
+  border-color: color-mix(in srgb, var(--acc2, #8b5cf6) 60%, transparent);
+  background: color-mix(in srgb, var(--acc2, #8b5cf6) 12%, transparent);
+}
+.tl-check:active {
+  transform: scale(0.88);
+}
+.tl-check:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--acc2, #8b5cf6) 55%, transparent);
+  outline-offset: 2px;
+}
+.tl-row.tl-task.is-done .tl-check {
+  background: var(--acc2, #8b5cf6);
+  border-color: transparent;
+}
+.tl-row.tl-task.is-done .tl-check svg path {
+  stroke-dashoffset: 0;
+}
+
+/* title: 13px/500; done → faint + animated strike (mirrors tasks.css) */
+.tl-task-title {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.35;
+  color: var(--text, #eceef5);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  transition: color 0.25s var(--_e);
+}
+.tl-row.tl-task.is-done .tl-task-title {
+  color: var(--faint, #646a80);
+}
+.tl-row.tl-task.is-done .tl-task-title::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 50%;
+  width: 100%;
+  height: 1.5px;
+  margin-top: -0.75px;
+  border-radius: 1px;
+  background: var(--faint, #646a80);
+  transform-origin: left center;
+  animation: strike 0.35s var(--_e) both;
+}
+
+/* done timed tasks stay on the timeline, dimmed like past rows */
+.tl-row.tl-task.is-done {
+  opacity: 0.45;
+}
+
+/* ---- live timed task chips: 'now' badge + tiny 'ends in Nm' countdown ----
+   (task cards have no .tl-meta wrapper, so .tl-count gets its own pill base;
+   color/border-color/background come from the shared .tl-count rule above) */
+.tl-row.tl-task .badge-live,
+.tl-row.tl-task .tl-count {
+  flex: none;
+}
+.tl-row.tl-task .tl-count {
+  flex: 0 1 auto; /* overrides the flex:none above — on narrow cards the
+                     chip shrinks + ellipsizes instead of overflowing */
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-family: var(--_mono);
+  font-size: 10px;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+  border-width: 1px;
+  border-style: solid;
+  border-radius: 999px;
+  padding: 2px 7px;
+}
